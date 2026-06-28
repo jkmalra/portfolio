@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 type CommandLinkProps = PropsWithChildren<{
   href: string;
   meta: string;
-};
+}>;
 
 export function CommandLink({ href, meta, children }: CommandLinkProps) {
   return (
