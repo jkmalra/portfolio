@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const navItems = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
@@ -33,7 +35,118 @@ const principles = [
   },
 ];
 
+const filters = ["All", "Compliance", "XR", "Systems"] as const;
+
+const projects = [
+  {
+    title: "SynapticWeb BCI",
+    category: "XR",
+    summary:
+      "A speculative brain-computer interface experience that turns neural intent into adaptive interfaces for future-ready applications.",
+    outcomes: [
+      "Introduced immersive interaction storytelling for neuro-adaptive products",
+      "Framed accessibility and ethics requirements for hands-free interfaces",
+      "Created a compelling flagship case study with rich demo potential",
+    ],
+    tech: ["WebXR", "Three.js", "GSAP", "Ethical AI"],
+  },
+  {
+    title: "AI Transparency Dashboard",
+    category: "Compliance",
+    summary:
+      "A trust-building dashboard that explains AI system lineage, risk signals, model usage, and why automated recommendations appear.",
+    outcomes: [
+      "Turns abstract governance work into a visual narrative",
+      "Supports recruiter and client confidence with explainability patterns",
+      "Aligns the portfolio with compliance-forward positioning",
+    ],
+    tech: ["React", "D3 patterns", "Accessibility", "Governance UX"],
+  },
+  {
+    title: "Aetheris HQNO",
+    category: "Systems",
+    summary:
+      "A speculative orchestration platform for quantum-neural workflows, presented as a future systems architecture case study.",
+    outcomes: [
+      "Demonstrates systems thinking beyond front-end polish",
+      "Supports consulting conversations around advanced technical direction",
+      "Translates complex infrastructure ideas into digestible product storytelling",
+    ],
+    tech: ["Distributed systems", "Visualization", "Strategy", "Architecture"],
+  },
+];
+
+const services = [
+  {
+    title: "AI compliance consulting",
+    text: "Advisory for teams that need transparency patterns, risk-conscious UX, and stronger trust signals in AI products.",
+  },
+  {
+    title: "Immersive product direction",
+    text: "Concept and interface design for spatial, interactive, or futuristic software experiences that still need practical usability.",
+  },
+  {
+    title: "Case-study storytelling",
+    text: "Turning technical systems into compelling narratives that recruiters, clients, and investors can understand quickly.",
+  },
+];
+
+const skillGroups = [
+  {
+    title: "Interface craft",
+    items: ["Responsive architecture", "Design systems", "Motion design", "Accessibility audits"],
+  },
+  {
+    title: "Future-facing tech",
+    items: ["WebXR concepts", "3D interaction storytelling", "AI product patterns", "Speculative systems design"],
+  },
+  {
+    title: "Trust and strategy",
+    items: ["Compliance UX", "Transparency reporting", "Product consulting", "Research synthesis"],
+  },
+];
+
+const timeline = [
+  {
+    period: "Now",
+    title: "AI compliance architect and portfolio futurist",
+    text: "Building a digital identity that merges immersive front-end execution with governance-centered product thinking.",
+  },
+  {
+    period: "Next horizon",
+    title: "XR and ethical AI case study builder",
+    text: "Expanding portfolio work into interactive demos, explainability systems, and deep-dive technical storytelling.",
+  },
+  {
+    period: "Long arc",
+    title: "Trusted systems strategist",
+    text: "Positioning for consulting and product leadership roles where clarity, safety, and innovation all matter.",
+  },
+];
+
+const posts = [
+  {
+    title: "Designing AI transparency people can actually understand",
+    meta: "Compliance UX · 6 min read",
+  },
+  {
+    title: "What speculative interfaces teach us about present-day product quality",
+    meta: "Future systems · 4 min read",
+  },
+  {
+    title: "Why futuristic portfolios still need accessible foundations",
+    meta: "Accessibility · 5 min read",
+  },
+];
+
 export default function App() {
+  const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>("All");
+
+  const visibleProjects =
+    activeFilter === "All"
+      ? projects
+      : projects.filter((project) => project.category === activeFilter);
+
   return (
     <div className="site-shell">
       <div className="orb orb-a" aria-hidden="true" />
@@ -141,6 +254,124 @@ export default function App() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="section content-section" id="projects">
+          <div className="section-heading section-heading-row">
+            <div>
+              <p className="eyebrow">Flagship work</p>
+              <h2>Case studies built for recruiters, clients, and futurists.</h2>
+            </div>
+            <div className="filter-row" role="tablist" aria-label="Project filters">
+              {filters.map((filter) => (
+                <button
+                  key={filter}
+                  className={`filter-pill${filter === activeFilter ? " active" : ""}`}
+                  onClick={() => setActiveFilter(filter)}
+                  type="button"
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="project-grid">
+            {visibleProjects.map((project) => (
+              <article key={project.title} className="project-card">
+                <div className="project-topline">
+                  <span>{project.category}</span>
+                  <span>Flagship case study</span>
+                </div>
+                <h3>{project.title}</h3>
+                <p>{project.summary}</p>
+
+                <ul className="project-list">
+                  {project.outcomes.map((outcome) => (
+                    <li key={outcome}>{outcome}</li>
+                  ))}
+                </ul>
+
+                <div className="tag-row" aria-label={`${project.title} technologies`}>
+                  {project.tech.map((tech) => (
+                    <span key={tech} className="tag">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section content-section">
+          <div className="section-heading">
+            <p className="eyebrow">Services</p>
+            <h2>What this portfolio now communicates as an offer.</h2>
+          </div>
+          <div className="service-grid">
+            {services.map((service) => (
+              <article key={service.title} className="service-card">
+                <h3>{service.title}</h3>
+                <p>{service.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section content-section">
+          <div className="dual-grid">
+            <div>
+              <div className="section-heading">
+                <p className="eyebrow">Capabilities</p>
+                <h2>Skills grouped around delivery, not just tools.</h2>
+              </div>
+              <div className="skill-groups">
+                {skillGroups.map((group) => (
+                  <article key={group.title} className="skill-card">
+                    <h3>{group.title}</h3>
+                    <ul>
+                      {group.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div id="experience">
+              <div className="section-heading">
+                <p className="eyebrow">Experience arc</p>
+                <h2>A timeline shaped around positioning and momentum.</h2>
+              </div>
+              <div className="timeline">
+                {timeline.map((item) => (
+                  <article key={item.title} className="timeline-card">
+                    <span className="timeline-period">{item.period}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section content-section">
+          <div className="section-heading">
+            <p className="eyebrow">Writing and signals</p>
+            <h2>Thought leadership spaces are ready for notes, articles, and insights.</h2>
+          </div>
+          <div className="post-grid">
+            {posts.map((post) => (
+              <article key={post.title} className="post-card">
+                <p className="post-meta">{post.meta}</p>
+                <h3>{post.title}</h3>
+                <a href="#contact">Turn this into a publishing roadmap</a>
+              </article>
+            ))}
           </div>
         </section>
       </main>
