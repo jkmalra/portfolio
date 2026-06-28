@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #060b13;
+  color: white;
+  font-family: var(--font-manrope), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(159, 245, 210, 0.22);
+  color: white;
+}
+
+.surface-shell {
+  @apply rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-surface backdrop-blur-xl;
+}
