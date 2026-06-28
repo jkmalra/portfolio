@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 const navItems = [
   { label: "Home", href: "#home" },
@@ -127,28 +127,108 @@ const timeline = [
 const posts = [
   {
     title: "Designing AI transparency people can actually understand",
-    meta: "Compliance UX · 6 min read",
+    meta: "Compliance UX - 6 min read",
   },
   {
     title: "What speculative interfaces teach us about present-day product quality",
-    meta: "Future systems · 4 min read",
+    meta: "Future systems - 4 min read",
   },
   {
     title: "Why futuristic portfolios still need accessible foundations",
-    meta: "Accessibility · 5 min read",
+    meta: "Accessibility - 5 min read",
   },
 ];
 
+const contactMethods = [
+  {
+    label: "Email",
+    value: "hello@jasmalra.dev",
+    href: "mailto:hello@jasmalra.dev",
+  },
+  {
+    label: "Resume",
+    value: "Download futurist CV",
+    href: "/jas-malra-resume.html",
+  },
+  {
+    label: "Availability",
+    value: "Open for consulting and product strategy",
+    href: "#contact",
+  },
+];
+
+type Theme = "dark" | "light";
+
 export default function App() {
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>("All");
+  const [theme, setTheme] = useState<Theme>("dark");
+  const [submitState, setSubmitState] = useState<"idle" | "sending" | "sent">("idle");
+  const [statusMessage, setStatusMessage] = useState(
+    "Share a few details and the site will prepare an email draft.",
+  );
 
   const visibleProjects =
     activeFilter === "All"
       ? projects
       : projects.filter((project) => project.category === activeFilter);
 
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("portfolio-theme");
+
+    if (savedTheme === "light" || savedTheme === "dark") {
+      setTheme(savedTheme);
+      return;
+    }
+
+    const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+    setTheme(prefersLight ? "light" : "dark");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem("portfolio-theme", theme);
+
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta) {
+      themeMeta.setAttribute("content", theme === "dark" ? "#07111f" : "#f4efe5");
+    }
+  }, [theme]);
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const name = String(formData.get("name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim();
+    const focus = String(formData.get("focus") ?? "").trim();
+    const message = String(formData.get("message") ?? "").trim();
+
+    if (!name || !email || !message) {
+      setStatusMessage("Please complete your name, email, and message before sending.");
+      return;
+    }
+
+    setSubmitState("sending");
+    setStatusMessage("Preparing your message...");
+
+    const subject = encodeURIComponent(`Portfolio inquiry from ${name}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\nProject focus: ${focus || "Not specified"}\n\n${message}`,
+    );
+
+    window.setTimeout(() => {
+      window.location.href = `mailto:hello@jasmalra.dev?subject=${subject}&body=${body}`;
+      setSubmitState("sent");
+      setStatusMessage("Your email draft is ready. Send it from your mail app and I will reply soon.");
+      event.currentTarget.reset();
+    }, 500);
+  };
+
   return (
     <div className="site-shell">
+      <a className="skip-link" href="#content">
+        Skip to content
+      </a>
       <div className="orb orb-a" aria-hidden="true" />
       <div className="orb orb-b" aria-hidden="true" />
       <div className="grid-haze" aria-hidden="true" />
@@ -170,12 +250,22 @@ export default function App() {
           ))}
         </nav>
 
-        <a className="nav-cta" href="#contact">
-          Book a strategy call
-        </a>
+        <div className="topbar-actions">
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          >
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </button>
+          <a className="nav-cta" href="#contact">
+            Book a strategy call
+          </a>
+        </div>
       </header>
 
-      <main>
+      <main id="content">
         <section className="hero section" id="home">
           <div className="hero-copy">
             <p className="eyebrow">Speculative systems, real-world trust</p>
@@ -374,7 +464,85 @@ export default function App() {
             ))}
           </div>
         </section>
+
+        <section className="section content-section contact-section" id="contact">
+          <div className="section-heading">
+            <p className="eyebrow">Contact</p>
+            <h2>Turn the portfolio into a real conversation.</h2>
+          </div>
+
+          <div className="contact-grid">
+            <article className="contact-panel">
+              <p>
+                The site now supports the main conversion goals from the research:
+                contact, resume access, and a clear articulation of services.
+              </p>
+
+              <div className="contact-methods">
+                {contactMethods.map((method) => (
+                  <a key={method.label} className="contact-method" href={method.href}>
+                    <span>{method.label}</span>
+                    <strong>{method.value}</strong>
+                  </a>
+                ))}
+              </div>
+            </article>
+
+            <form className="contact-form" onSubmit={handleSubmit}>
+              <label>
+                Name
+                <input name="name" type="text" placeholder="Your name" autoComplete="name" />
+              </label>
+
+              <label>
+                Email
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                />
+              </label>
+
+              <label>
+                Project focus
+                <input
+                  name="focus"
+                  type="text"
+                  placeholder="Compliance audit, immersive product, portfolio revamp..."
+                />
+              </label>
+
+              <label>
+                Message
+                <textarea
+                  name="message"
+                  rows={5}
+                  placeholder="Tell me what you want to build, improve, or launch."
+                />
+              </label>
+
+              <div className="form-actions">
+                <button className="button button-primary" type="submit" disabled={submitState === "sending"}>
+                  {submitState === "sending" ? "Preparing..." : "Open email draft"}
+                </button>
+                <a className="button button-secondary" href="/jas-malra-resume.html" download>
+                  Download resume
+                </a>
+              </div>
+
+              <p className="form-status" aria-live="polite">
+                {statusMessage}
+              </p>
+            </form>
+          </div>
+        </section>
       </main>
+
+      <footer className="site-footer">
+        <p>Jas Malra portfolio concept built from the provided research direction.</p>
+        <a href="#home">Back to top</a>
+      </footer>
     </div>
   );
 }
