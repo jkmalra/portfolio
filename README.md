@@ -1,16 +1,24 @@
 # Jas Malra Portfolio
 
-A futuristic portfolio website built from the provided research notes using React, TypeScript, and Vite.
+A future-facing portfolio rebuilt as a multi-route operating surface with Next.js, React, Tailwind CSS, and Framer Motion.
 
-## Features
+## Architecture
 
-- Immersive landing page with futuristic visual direction
-- About, projects, services, skills, experience, writing, and contact sections
-- Project category filtering
-- Dark and light theme toggle with saved preference
-- Accessible skip link, focus states, and reduced-motion support
-- Resume download page and email-draft contact flow
-- Static 404 page for deployment polish
+- `/` showcase index and command-surface landing page
+- `/projects` project hub with routed dossier pages
+- `/research` deep frameworks and technical writing
+- `/blog` public writing and updates
+- `/resume` hiring-focused resume surface with PDF download
+- `/offers` separate client engagement page
+- `/about` profile and future direction
+
+## Stack
+
+- Next.js App Router
+- React 19
+- Tailwind CSS
+- Framer Motion
+- TypeScript
 
 ## Run locally
 
@@ -27,8 +35,6 @@ npm run build
 
 ## Notes
 
-The personal details, positioning, and content structure are based on the two research files you provided. Since no real production social links, backend form endpoint, or final resume PDF were included in the source material, the site currently uses:
-
-- a client-side `mailto:` contact workflow
-- a downloadable HTML resume page
-- portfolio content aligned to the AI compliance and futurist brief
+- The content and positioning are grounded in the research files you provided.
+- The offers page is intentionally separated from the portfolio showcase.
+- Contact and booking currently use a transparent email-driven flow instead of a hidden third-party form backend.
