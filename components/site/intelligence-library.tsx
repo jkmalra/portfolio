@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { IntelligenceEntry } from "@/lib/site-data";
 import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-graph";
@@ -63,12 +64,21 @@ function getLaneGridClasses(lane: IntelligenceEntry["lane"]) {
 }
 
 function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
+  const router = useRouter();
   const relationshipCount =
     (entry.knowledgeConnections?.length ?? 0) + (entry.relatedLinks?.length ?? 0) + (entry.references?.length ?? 0);
 
   return (
-    <Link
-      href={`/intelligence/${entry.slug}`}
+    <article
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(`/intelligence/${entry.slug}`)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          router.push(`/intelligence/${entry.slug}`);
+        }
+      }}
       className={`group rounded-[1.75rem] border border-white/10 bg-white/[0.04] transition duration-300 hover:-translate-y-1 hover:border-azure/35 hover:bg-white/[0.06] ${getLayoutClasses(entry.editorialLayout)}`}
     >
       <div className="flex h-full flex-col gap-5">
@@ -104,7 +114,11 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
 
         {entry.knowledgeConnections && entry.knowledgeConnections.length > 0 ? (
           <div className="rounded-[1.35rem] border border-white/10 bg-black/10 p-3">
-            <ConnectedKnowledgeGraph connections={entry.knowledgeConnections.slice(0, 3)} compact />
+            <ConnectedKnowledgeGraph
+              connections={entry.knowledgeConnections.slice(0, 3)}
+              compact
+              stopPropagation
+            />
           </div>
         ) : null}
 
@@ -117,7 +131,7 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
           </span>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
 

@@ -4,11 +4,13 @@ import { IntelligenceEntry } from "@/lib/site-data";
 type ConnectedKnowledgeGraphProps = {
   connections: NonNullable<IntelligenceEntry["knowledgeConnections"]>;
   compact?: boolean;
+  stopPropagation?: boolean;
 };
 
 export function ConnectedKnowledgeGraph({
   connections,
   compact = false,
+  stopPropagation = false,
 }: ConnectedKnowledgeGraphProps) {
   return (
     <div className="space-y-4">
@@ -24,6 +26,7 @@ export function ConnectedKnowledgeGraph({
             </span>
             <Link
               href={connection.href}
+              onClick={stopPropagation ? (event) => event.stopPropagation() : undefined}
               className={`group block rounded-[1.35rem] border border-white/10 bg-black/20 transition duration-300 hover:border-aurora/35 hover:bg-white/[0.05] ${
                 compact ? "px-4 py-3" : "px-4 py-4"
               }`}
