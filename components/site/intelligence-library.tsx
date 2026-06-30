@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { IntelligenceEntry } from "@/lib/site-data";
+import { ResearchPipeline } from "@/components/site/research-pipeline";
 
 type IntelligenceLibraryProps = {
   entries: IntelligenceEntry[];
@@ -23,11 +24,101 @@ const filterLabels = [
 const laneOrder: IntelligenceEntry["lane"][] = [
   "Featured frameworks",
   "Latest writing",
+  "Deep dives",
   "Research notes",
   "Thinking and opinions",
-  "Deep dives",
   "Archived content",
 ];
+
+function getLayoutClasses(layout: IntelligenceEntry["editorialLayout"]) {
+  switch (layout) {
+    case "featured":
+      return "lg:col-span-2 xl:col-span-2 p-7 md:p-8";
+    case "wide":
+      return "lg:col-span-2 p-6";
+    case "deep":
+      return "lg:col-span-2 xl:col-span-2 p-7";
+    case "compact":
+      return "p-5";
+    case "minimal":
+      return "p-4";
+    default:
+      return "p-5";
+  }
+}
+
+function getLaneGridClasses(lane: IntelligenceEntry["lane"]) {
+  switch (lane) {
+    case "Featured frameworks":
+    case "Deep dives":
+      return "grid gap-4 xl:grid-cols-3";
+    case "Latest writing":
+      return "grid gap-4 lg:grid-cols-2 xl:grid-cols-3";
+    case "Thinking and opinions":
+      return "grid gap-4 lg:grid-cols-2";
+    default:
+      return "grid gap-4 lg:grid-cols-2";
+  }
+}
+
+function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
+  const relationshipCount = (entry.relatedLinks?.length ?? 0) + (entry.references?.length ?? 0);
+
+  return (
+    <Link
+      href={`/intelligence/${entry.slug}`}
+      className={`group rounded-[1.75rem] border border-white/10 bg-white/[0.04] transition duration-300 hover:-translate-y-1 hover:border-azure/35 hover:bg-white/[0.06] ${getLayoutClasses(entry.editorialLayout)}`}
+    >
+      <div className="flex h-full flex-col gap-5">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/40 transition duration-300 group-hover:text-white/58">
+          <span>{entry.type}</span>
+          <span>{entry.topic}</span>
+          <span>{entry.readTime}</span>
+          <span>{entry.status}</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 text-xs text-white/48">
+          <span className="rounded-full border border-white/10 px-2.5 py-1">{entry.activity}</span>
+          <span>{entry.freshness}</span>
+          {relationshipCount > 0 ? <span>{relationshipCount} related links</span> : null}
+        </div>
+
+        <div className="space-y-3">
+          <h4
+            className={`font-display text-white ${
+              entry.editorialLayout === "featured" || entry.editorialLayout === "deep"
+                ? "text-3xl md:text-4xl"
+                : entry.editorialLayout === "wide"
+                  ? "text-3xl"
+                  : "text-2xl"
+            }`}
+          >
+            {entry.title}
+          </h4>
+          <p className="max-w-3xl text-sm leading-7 text-white/62">{entry.summary}</p>
+        </div>
+
+        {entry.pipeline ? <ResearchPipeline current={entry.pipeline.current} /> : null}
+
+        <div className="mt-auto flex items-end justify-between gap-4">
+          <div className="flex flex-wrap gap-2">
+            {entry.tags.slice(0, entry.editorialLayout === "minimal" ? 2 : 3).map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/46"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <span className="translate-x-0 text-sm text-aurora transition duration-300 group-hover:translate-x-1 group-hover:text-white">
+            Open →
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
   const [query, setQuery] = useState("");
@@ -43,6 +134,8 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
         entry.topic,
         entry.type,
         entry.tags.join(" "),
+        entry.activity,
+        entry.freshness,
       ]
         .join(" ")
         .toLowerCase();
@@ -68,6 +161,7 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
     .filter((group) => group.entries.length > 0);
 
   const majorTags = Array.from(new Set(entries.flatMap((entry) => entry.tags))).slice(0, 10);
+  const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
 
   return (
     <div className="space-y-10">
@@ -118,31 +212,12 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
 
       <div className="grid gap-4 lg:grid-cols-[1.08fr,0.92fr]">
         <div className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.24em] text-white/42">Pinned reading</p>
-          {featuredEntries.map((entry) => (
-            <Link
-              key={entry.slug}
-              href={`/intelligence/${entry.slug}`}
-              className="block rounded-[1.85rem] border border-white/10 bg-white/[0.05] p-6 transition hover:-translate-y-1 hover:border-aurora/35"
-            >
-              <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.22em] text-white/40">
-                <span>{entry.type}</span>
-                <span>{entry.topic}</span>
-                <span>{entry.readTime}</span>
-                <span>{entry.status}</span>
-              </div>
-              <h3 className="mt-5 font-display text-3xl text-white">{entry.title}</h3>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/64">{entry.summary}</p>
-              <p className="mt-5 text-sm leading-7 text-white/50">{entry.intro}</p>
-              <div className="mt-8 flex flex-wrap gap-2">
-                {entry.tags.map((tag) => (
-                  <span key={tag} className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/48">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </Link>
-          ))}
+          <p className="text-xs uppercase tracking-[0.24em] text-white/42">Featured content</p>
+          <div className="grid gap-4 xl:grid-cols-2">
+            {featuredEntries.map((entry) => (
+              <IntelligenceCard key={entry.slug} entry={entry} />
+            ))}
+          </div>
         </div>
 
         <aside className="rounded-[1.85rem] border border-white/10 bg-white/[0.04] p-6">
@@ -150,6 +225,16 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
           <p className="mt-4 text-sm leading-7 text-white/62">
             This is the intellectual layer of the portfolio: research, public writing, and personal thinking arranged as one editorial system.
           </p>
+          <div className="mt-8 space-y-3">
+            <p className="text-xs uppercase tracking-[0.22em] text-white/36">Living activity</p>
+            <div className="flex flex-wrap gap-2">
+              {liveSignals.map((signal) => (
+                <span key={signal} className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/50">
+                  {signal}
+                </span>
+              ))}
+            </div>
+          </div>
           <div className="mt-8 flex flex-wrap gap-2">
             {majorTags.map((tag) => (
               <button
@@ -163,9 +248,8 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
             ))}
           </div>
           <div className="mt-8 space-y-3 text-sm text-white/54">
-            <p>Featured frameworks for deep proof</p>
-            <p>Latest writing for public signal</p>
-            <p>Research notes and thinking for long-range identity</p>
+            <p>Featured content appears first, then recent updates, then deeper frameworks and notes.</p>
+            <p>Activity and pipeline signals show how ideas move toward publication and project application.</p>
           </div>
         </aside>
       </div>
@@ -180,37 +264,9 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
               </div>
               <p className="text-sm text-white/40">{group.entries.length} items</p>
             </div>
-            <div className="grid gap-4">
+            <div className={getLaneGridClasses(group.lane)}>
               {group.entries.map((entry) => (
-                <Link
-                  key={entry.slug}
-                  href={`/intelligence/${entry.slug}`}
-                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 transition hover:-translate-y-1 hover:border-azure/35"
-                >
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="max-w-3xl">
-                      <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.22em] text-white/40">
-                        <span>{entry.type}</span>
-                        <span>{entry.topic}</span>
-                        <span>{entry.readTime}</span>
-                        <span>{entry.date}</span>
-                        <span>{entry.status}</span>
-                      </div>
-                      <h4 className="mt-4 font-display text-2xl text-white">{entry.title}</h4>
-                      <p className="mt-3 text-sm leading-7 text-white/62">{entry.summary}</p>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap gap-2 lg:max-w-xs lg:justify-end">
-                      {entry.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/48"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </Link>
+                <IntelligenceCard key={entry.slug} entry={entry} />
               ))}
             </div>
           </section>
