@@ -6,8 +6,7 @@ A future-facing portfolio rebuilt as a multi-route operating surface with Next.j
 
 - `/` showcase index and command-surface landing page
 - `/projects` project hub with routed dossier pages
-- `/research` deep frameworks and technical writing
-- `/blog` public writing and updates
+- `/intelligence` unified research, writing, and thinking layer
 - `/resume` hiring-focused resume surface with PDF download
 - `/offers` separate client engagement page
 - `/about` profile and future direction
@@ -36,5 +35,6 @@ npm run build
 ## Notes
 
 - The content and positioning are grounded in the research files you provided.
-- The offers page is intentionally separated from the portfolio showcase.
+- Research, blog-style writing, and personal thinking are now unified into one editorial intelligence system.
+- The offers page remains intentionally separated from the main portfolio showcase.
 - Contact and booking currently use a transparent email-driven flow instead of a hidden third-party form backend.
