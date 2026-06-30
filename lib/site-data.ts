@@ -52,6 +52,25 @@ export type IntelligenceEntry = {
   featured?: boolean;
   pinned?: boolean;
   status: "Published" | "Draft" | "Archived";
+  activity:
+    | "Currently researching"
+    | "Currently writing"
+    | "Recently updated"
+    | "Draft"
+    | "In review"
+    | "Published"
+    | "Archived";
+  freshness: string;
+  editorialLayout: "featured" | "wide" | "compact" | "minimal" | "deep";
+  pipeline?: {
+    current:
+      | "Idea"
+      | "Reading"
+      | "Writing"
+      | "Review"
+      | "Published"
+      | "Applied in Project";
+  };
 };
 
 export const primaryNav = [
@@ -250,6 +269,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     featured: true,
     pinned: true,
     status: "Published",
+    activity: "Recently updated",
+    freshness: "Updated 2 days ago",
+    editorialLayout: "deep",
+    pipeline: { current: "Applied in Project" },
   },
   {
     slug: "future-systems-reading-models",
@@ -284,6 +307,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     featured: true,
     pinned: true,
     status: "Published",
+    activity: "Published",
+    freshness: "Revised after project completion",
+    editorialLayout: "wide",
+    pipeline: { current: "Published" },
   },
   {
     slug: "portfolio-operating-surfaces",
@@ -315,6 +342,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     featured: true,
     pinned: true,
     status: "Published",
+    activity: "Recently updated",
+    freshness: "Updated 1 week ago",
+    editorialLayout: "featured",
+    pipeline: { current: "Published" },
   },
   {
     slug: "building-trust-without-killing-momentum",
@@ -343,6 +374,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     tags: ["AI product", "Trust", "Execution"],
     featured: true,
     status: "Published",
+    activity: "Published",
+    freshness: "Updated 8 days ago",
+    editorialLayout: "minimal",
+    pipeline: { current: "Applied in Project" },
   },
   {
     slug: "why-future-portfolios-need-strong-route-design",
@@ -370,6 +405,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     date: "2026-06-18",
     tags: ["Portfolio", "Routing", "Identity"],
     status: "Published",
+    activity: "Published",
+    freshness: "Published 12 days ago",
+    editorialLayout: "compact",
+    pipeline: { current: "Published" },
   },
   {
     slug: "systems-writing-as-a-technical-skill",
@@ -397,6 +436,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     date: "2026-06-15",
     tags: ["Writing", "Systems", "Communication"],
     status: "Published",
+    activity: "Recently updated",
+    freshness: "Updated 5 days ago",
+    editorialLayout: "wide",
+    pipeline: { current: "Published" },
   },
   {
     slug: "decision-logs-for-future-products",
@@ -424,6 +467,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     date: "2026-06-12",
     tags: ["Decision logs", "Systems", "Governance"],
     status: "Published",
+    activity: "Currently researching",
+    freshness: "Research started 3 weeks ago",
+    editorialLayout: "compact",
+    pipeline: { current: "Reading" },
   },
   {
     slug: "design-principles-for-calm-intelligence-surfaces",
@@ -451,6 +498,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     date: "2026-06-09",
     tags: ["Design principles", "Editorial systems", "Future UI"],
     status: "Published",
+    activity: "Currently writing",
+    freshness: "Currently being expanded",
+    editorialLayout: "wide",
+    pipeline: { current: "Writing" },
   },
   {
     slug: "notes-on-governance-language",
@@ -478,6 +529,10 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     date: "2026-06-05",
     tags: ["Governance", "Language", "UX writing"],
     status: "Draft",
+    activity: "In review",
+    freshness: "Draft revised after language audit",
+    editorialLayout: "minimal",
+    pipeline: { current: "Review" },
   },
 ];
 
