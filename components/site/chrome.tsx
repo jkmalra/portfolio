@@ -15,9 +15,9 @@ export function SiteChrome({ children }: PropsWithChildren) {
             </span>
             <span className="flex flex-col">
               <span className="font-display text-sm uppercase tracking-[0.22em] text-white/70">
-                Signal OS
+                Jaskaran
               </span>
-              <span className="text-sm text-white/90">Jas Malra</span>
+              <span className="text-sm text-white/90">Malra</span>
             </span>
           </Link>
 
