@@ -4,7 +4,7 @@ import { CommandLink } from "@/components/site/command-link";
 import { MetricCluster } from "@/components/site/metric-cluster";
 import { ProjectCard } from "@/components/site/project-card";
 import { SectionIntro } from "@/components/site/section-intro";
-import { blogEntries, featuredSignals, projects, proofPoints, researchEntries, resumeSummary } from "@/lib/site-data";
+import { featuredSignals, intelligenceEntries, projects, proofPoints, resumeSummary } from "@/lib/site-data";
 
 export default function HomePage() {
   return (
@@ -24,8 +24,8 @@ export default function HomePage() {
             <Link href="/projects" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black">
               Enter project hub
             </Link>
-            <Link href="/research" className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
-              Open research layer
+            <Link href="/intelligence" className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
+              Open intelligence layer
             </Link>
           </div>
           <div className="mt-12 flex flex-wrap gap-2">
@@ -47,6 +47,9 @@ export default function HomePage() {
               <CommandLink href="/resume" meta="Hiring surface">
                 Resume and summary
               </CommandLink>
+              <CommandLink href="/intelligence" meta="Editorial system">
+                Research, writing, and thinking
+              </CommandLink>
               <CommandLink href="/offers" meta="Separate client track">
                 Offers and booking
               </CommandLink>
@@ -54,10 +57,10 @@ export default function HomePage() {
           </div>
           <div className="surface-shell p-6">
             <p className="text-xs uppercase tracking-[0.24em] text-white/42">Latest signal</p>
-            <h2 className="mt-6 font-display text-3xl text-white">{researchEntries[0]?.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-white/62">{researchEntries[0]?.summary}</p>
-            <Link href={`/research/${researchEntries[0]?.slug}`} className="mt-8 inline-flex text-sm text-aurora">
-              Read featured research
+            <h2 className="mt-6 font-display text-3xl text-white">{intelligenceEntries[0]?.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-white/62">{intelligenceEntries[0]?.summary}</p>
+            <Link href={`/intelligence/${intelligenceEntries[0]?.slug}`} className="mt-8 inline-flex text-sm text-aurora">
+              Read featured piece
             </Link>
           </div>
         </Reveal>
@@ -68,7 +71,7 @@ export default function HomePage() {
           <SectionIntro
             eyebrow="Trust layer"
             title="Command-surface clarity instead of a noisy all-in-one page."
-            description="The homepage acts as a routing console. It previews the strongest proof and moves each audience into the right environment without mixing job-facing, research, and client conversion content together."
+            description="The homepage acts as a routing console. It previews the strongest proof and moves each audience into the right environment without mixing job-facing, intelligence, and client conversion content together."
           />
         </Reveal>
         <Reveal delay={0.06} className="mt-10">
@@ -113,11 +116,11 @@ export default function HomePage() {
         <Reveal delay={0.08} className="grid gap-6">
           <div className="surface-shell p-8">
             <p className="font-display text-xs uppercase tracking-[0.34em] text-azure/80">Research signal</p>
-            <h2 className="mt-6 font-display text-4xl text-white">Frameworks, essays, and deep technical thinking.</h2>
+            <h2 className="mt-6 font-display text-4xl text-white">One intelligence layer for frameworks, essays, and clear thinking.</h2>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
-              {researchEntries.slice(0, 2).map((entry) => (
-                <Link key={entry.slug} href={`/research/${entry.slug}`} className="rounded-[1.75rem] border border-white/10 bg-black/20 p-5 transition hover:border-azure/30">
-                  <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.category}</p>
+              {intelligenceEntries.slice(0, 2).map((entry) => (
+                <Link key={entry.slug} href={`/intelligence/${entry.slug}`} className="rounded-[1.75rem] border border-white/10 bg-black/20 p-5 transition hover:border-azure/30">
+                  <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.type}</p>
                   <h3 className="mt-4 font-display text-2xl text-white">{entry.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-white/62">{entry.summary}</p>
                 </Link>
@@ -126,12 +129,12 @@ export default function HomePage() {
           </div>
 
           <div className="surface-shell p-8">
-            <p className="font-display text-xs uppercase tracking-[0.34em] text-aurora/80">Latest writing</p>
+            <p className="font-display text-xs uppercase tracking-[0.34em] text-aurora/80">Latest intelligence</p>
             <div className="mt-6 space-y-4">
-              {blogEntries.slice(0, 2).map((entry) => (
-                <Link key={entry.slug} href={`/blog/${entry.slug}`} className="flex items-start justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-black/20 p-4 transition hover:border-aurora/30">
+              {intelligenceEntries.slice(3, 5).map((entry) => (
+                <Link key={entry.slug} href={`/intelligence/${entry.slug}`} className="flex items-start justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-black/20 p-4 transition hover:border-aurora/30">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.category}</p>
+                    <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.type}</p>
                     <h3 className="mt-3 font-display text-xl text-white">{entry.title}</h3>
                   </div>
                   <span className="text-sm text-white/40">{entry.readTime}</span>
