@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Reveal } from "@/components/motion/reveal";
 import { ArticleTools } from "@/components/site/article-tools";
+import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-graph";
 import { ResearchPipeline } from "@/components/site/research-pipeline";
 import { intelligenceEntries } from "@/lib/site-data";
 
@@ -45,30 +46,9 @@ export default async function IntelligenceEntryPage({
             </div>
           ) : null}
 
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/42">Tags</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {entry.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/50"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {entry.relatedLinks && entry.relatedLinks.length > 0 ? (
+          {entry.knowledgeConnections && entry.knowledgeConnections.length > 0 ? (
             <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/42">Related links</p>
-              <div className="mt-4 grid gap-3">
-                {entry.relatedLinks.map((link) => (
-                  <Link key={link.href} href={link.href} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/76">
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
+              <ConnectedKnowledgeGraph connections={entry.knowledgeConnections} />
             </div>
           ) : null}
         </Reveal>
@@ -122,6 +102,12 @@ export default async function IntelligenceEntryPage({
                 ))}
               </ul>
             </section>
+
+            {entry.knowledgeConnections && entry.knowledgeConnections.length > 0 ? (
+              <section>
+                <ConnectedKnowledgeGraph connections={entry.knowledgeConnections} />
+              </section>
+            ) : null}
 
             {entry.references && entry.references.length > 0 ? (
               <section>

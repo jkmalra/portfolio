@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { IntelligenceEntry } from "@/lib/site-data";
+import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-graph";
 import { ResearchPipeline } from "@/components/site/research-pipeline";
 
 type IntelligenceLibraryProps = {
@@ -62,7 +63,8 @@ function getLaneGridClasses(lane: IntelligenceEntry["lane"]) {
 }
 
 function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
-  const relationshipCount = (entry.relatedLinks?.length ?? 0) + (entry.references?.length ?? 0);
+  const relationshipCount =
+    (entry.knowledgeConnections?.length ?? 0) + (entry.relatedLinks?.length ?? 0) + (entry.references?.length ?? 0);
 
   return (
     <Link
@@ -80,7 +82,7 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
         <div className="flex flex-wrap items-center gap-2 text-xs text-white/48">
           <span className="rounded-full border border-white/10 px-2.5 py-1">{entry.activity}</span>
           <span>{entry.freshness}</span>
-          {relationshipCount > 0 ? <span>{relationshipCount} related links</span> : null}
+          {relationshipCount > 0 ? <span>{relationshipCount} connected items</span> : null}
         </div>
 
         <div className="space-y-3">
@@ -100,16 +102,15 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
 
         {entry.pipeline ? <ResearchPipeline current={entry.pipeline.current} /> : null}
 
+        {entry.knowledgeConnections && entry.knowledgeConnections.length > 0 ? (
+          <div className="rounded-[1.35rem] border border-white/10 bg-black/10 p-3">
+            <ConnectedKnowledgeGraph connections={entry.knowledgeConnections.slice(0, 3)} compact />
+          </div>
+        ) : null}
+
         <div className="mt-auto flex items-end justify-between gap-4">
-          <div className="flex flex-wrap gap-2">
-            {entry.tags.slice(0, entry.editorialLayout === "minimal" ? 2 : 3).map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/46"
-              >
-                {tag}
-              </span>
-            ))}
+          <div className="text-xs uppercase tracking-[0.18em] text-white/36">
+            {entry.knowledgeConnections?.[0]?.kind ?? "Knowledge"} linkage
           </div>
           <span className="translate-x-0 text-sm text-aurora transition duration-300 group-hover:translate-x-1 group-hover:text-white">
             Open →
@@ -160,7 +161,9 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
     }))
     .filter((group) => group.entries.length > 0);
 
-  const majorTags = Array.from(new Set(entries.flatMap((entry) => entry.tags))).slice(0, 10);
+  const majorConnections = Array.from(
+    new Set(entries.flatMap((entry) => (entry.knowledgeConnections ?? []).map((connection) => connection.kind))),
+  );
   const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
 
   return (
@@ -236,14 +239,14 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
             </div>
           </div>
           <div className="mt-8 flex flex-wrap gap-2">
-            {majorTags.map((tag) => (
+            {majorConnections.map((kind) => (
               <button
-                key={tag}
+                key={kind}
                 type="button"
-                onClick={() => setQuery(tag)}
+                onClick={() => setQuery(kind)}
                 className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/50 transition hover:text-white"
               >
-                {tag}
+                {kind}
               </button>
             ))}
           </div>
