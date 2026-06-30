@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Reveal } from "@/components/motion/reveal";
 import { ArticleTools } from "@/components/site/article-tools";
+import { ResearchPipeline } from "@/components/site/research-pipeline";
 import { intelligenceEntries } from "@/lib/site-data";
 
 export function generateStaticParams() {
@@ -29,6 +30,20 @@ export default async function IntelligenceEntryPage({
       <div className="grid gap-6 xl:grid-cols-[0.78fr,1.22fr]">
         <Reveal className="space-y-6">
           <ArticleTools title={entry.title} />
+
+          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-white/42">Activity</p>
+            <div className="mt-4 space-y-3 text-sm text-white/62">
+              <p>{entry.activity}</p>
+              <p>{entry.freshness}</p>
+            </div>
+          </div>
+
+          {entry.pipeline ? (
+            <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
+              <ResearchPipeline current={entry.pipeline.current} />
+            </div>
+          ) : null}
 
           <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
             <p className="text-xs uppercase tracking-[0.24em] text-white/42">Tags</p>
@@ -62,6 +77,11 @@ export default async function IntelligenceEntryPage({
           <p className="font-display text-xs uppercase tracking-[0.34em] text-aurora/75">
             {entry.type} · {entry.topic} · {entry.readTime} · {entry.date}
           </p>
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-white/44">
+            <span className="rounded-full border border-white/10 px-3 py-1">{entry.activity}</span>
+            <span>{entry.freshness}</span>
+            <span>{entry.status}</span>
+          </div>
           <h1 className="mt-6 max-w-4xl font-display text-5xl leading-[0.94] text-white md:text-6xl">
             {entry.title}
           </h1>
