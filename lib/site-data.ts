@@ -71,6 +71,19 @@ export type IntelligenceEntry = {
       | "Published"
       | "Applied in Project";
   };
+  knowledgeConnections?: {
+    kind:
+      | "Projects"
+      | "Frameworks"
+      | "Research"
+      | "Case studies"
+      | "Open source"
+      | "Articles"
+      | "Standards"
+      | "Technologies";
+    label: string;
+    href: string;
+  }[];
 };
 
 export const primaryNav = [
@@ -273,6 +286,12 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Updated 2 days ago",
     editorialLayout: "deep",
     pipeline: { current: "Applied in Project" },
+    knowledgeConnections: [
+      { kind: "Standards", label: "EU AI Act", href: "https://artificialintelligenceact.eu/" },
+      { kind: "Projects", label: "Aether Signal", href: "/projects/aether-signal" },
+      { kind: "Frameworks", label: "Risk Assessment Framework", href: "/intelligence/portfolio-operating-surfaces" },
+      { kind: "Open source", label: "Model Card Toolkit", href: "https://github.com/tensorflow/model-card-toolkit" },
+    ],
   },
   {
     slug: "future-systems-reading-models",
@@ -311,6 +330,12 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Revised after project completion",
     editorialLayout: "wide",
     pipeline: { current: "Published" },
+    knowledgeConnections: [
+      { kind: "Projects", label: "Helios Lattice", href: "/projects/helios-lattice" },
+      { kind: "Technologies", label: "Systems Mapping", href: "/projects/helios-lattice" },
+      { kind: "Articles", label: "Systems writing is a technical skill", href: "/intelligence/systems-writing-as-a-technical-skill" },
+      { kind: "Frameworks", label: "Scenario Matrix", href: "/projects/helios-lattice" },
+    ],
   },
   {
     slug: "portfolio-operating-surfaces",
@@ -346,6 +371,12 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Updated 1 week ago",
     editorialLayout: "featured",
     pipeline: { current: "Published" },
+    knowledgeConnections: [
+      { kind: "Projects", label: "Signal OS", href: "/projects/signal-os" },
+      { kind: "Case studies", label: "Route design proof", href: "/projects/signal-os" },
+      { kind: "Articles", label: "Why future portfolios need strong route design", href: "/intelligence/why-future-portfolios-need-strong-route-design" },
+      { kind: "Frameworks", label: "Operating Surface Model", href: "/intelligence/portfolio-operating-surfaces" },
+    ],
   },
   {
     slug: "building-trust-without-killing-momentum",
@@ -378,6 +409,11 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Updated 8 days ago",
     editorialLayout: "minimal",
     pipeline: { current: "Applied in Project" },
+    knowledgeConnections: [
+      { kind: "Research", label: "Explainable AI control surfaces", href: "/intelligence/explainable-ai-control-surfaces" },
+      { kind: "Projects", label: "Aether Signal", href: "/projects/aether-signal" },
+      { kind: "Standards", label: "NIST AI RMF", href: "https://www.nist.gov/itl/ai-risk-management-framework" },
+    ],
   },
   {
     slug: "why-future-portfolios-need-strong-route-design",
@@ -409,6 +445,11 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Published 12 days ago",
     editorialLayout: "compact",
     pipeline: { current: "Published" },
+    knowledgeConnections: [
+      { kind: "Frameworks", label: "Operating Surface Model", href: "/intelligence/portfolio-operating-surfaces" },
+      { kind: "Projects", label: "Signal OS", href: "/projects/signal-os" },
+      { kind: "Articles", label: "Design principles for calm intelligence surfaces", href: "/intelligence/design-principles-for-calm-intelligence-surfaces" },
+    ],
   },
   {
     slug: "systems-writing-as-a-technical-skill",
@@ -440,6 +481,11 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Updated 5 days ago",
     editorialLayout: "wide",
     pipeline: { current: "Published" },
+    knowledgeConnections: [
+      { kind: "Research", label: "Future systems reading models", href: "/intelligence/future-systems-reading-models" },
+      { kind: "Projects", label: "Helios Lattice", href: "/projects/helios-lattice" },
+      { kind: "Technologies", label: "Architecture Writing", href: "/projects/helios-lattice" },
+    ],
   },
   {
     slug: "decision-logs-for-future-products",
@@ -471,6 +517,11 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Research started 3 weeks ago",
     editorialLayout: "compact",
     pipeline: { current: "Reading" },
+    knowledgeConnections: [
+      { kind: "Standards", label: "Operational logging standards", href: "https://opentelemetry.io/" },
+      { kind: "Projects", label: "Aether Signal", href: "/projects/aether-signal" },
+      { kind: "Frameworks", label: "Decision Memory Model", href: "/intelligence/decision-logs-for-future-products" },
+    ],
   },
   {
     slug: "design-principles-for-calm-intelligence-surfaces",
@@ -502,6 +553,11 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Currently being expanded",
     editorialLayout: "wide",
     pipeline: { current: "Writing" },
+    knowledgeConnections: [
+      { kind: "Projects", label: "Signal OS", href: "/projects/signal-os" },
+      { kind: "Articles", label: "Portfolio operating surfaces", href: "/intelligence/portfolio-operating-surfaces" },
+      { kind: "Frameworks", label: "Calm Editorial Systems", href: "/intelligence/design-principles-for-calm-intelligence-surfaces" },
+    ],
   },
   {
     slug: "notes-on-governance-language",
@@ -533,6 +589,11 @@ export const intelligenceEntries: IntelligenceEntry[] = [
     freshness: "Draft revised after language audit",
     editorialLayout: "minimal",
     pipeline: { current: "Review" },
+    knowledgeConnections: [
+      { kind: "Research", label: "Explainable AI control surfaces", href: "/intelligence/explainable-ai-control-surfaces" },
+      { kind: "Standards", label: "EU AI Act", href: "https://artificialintelligenceact.eu/" },
+      { kind: "Articles", label: "Building trust in AI products without killing momentum", href: "/intelligence/building-trust-without-killing-momentum" },
+    ],
   },
 ];
 
