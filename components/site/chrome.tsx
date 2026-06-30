@@ -47,8 +47,8 @@ export function SiteChrome({ children }: PropsWithChildren) {
             <Link href="/resume" className="hover:text-white">
               Resume
             </Link>
-            <Link href="/research" className="hover:text-white">
-              Research
+            <Link href="/intelligence" className="hover:text-white">
+              Intelligence
             </Link>
             <Link href="/offers" className="hover:text-white">
               Offers
