@@ -4,9 +4,15 @@ import { CommandLink } from "@/components/site/command-link";
 import { MetricCluster } from "@/components/site/metric-cluster";
 import { ProjectCard } from "@/components/site/project-card";
 import { SectionIntro } from "@/components/site/section-intro";
-import { featuredSignals, intelligenceEntries, projects, proofPoints, resumeSummary } from "@/lib/site-data";
+import { getFeaturedIntelligenceEntries, getLatestIntelligenceEntries } from "@/lib/intelligence";
+import { featuredSignals, projects, proofPoints, resumeSummary } from "@/lib/site-data";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [featuredEntries, latestEntries] = await Promise.all([
+    getFeaturedIntelligenceEntries(),
+    getLatestIntelligenceEntries(5),
+  ]);
+
   return (
     <div id="main-content">
       <section className="mx-auto grid w-[min(1320px,calc(100%-2rem))] gap-6 py-10 md:w-[min(1320px,calc(100%-3rem))] lg:grid-cols-[1.25fr,0.75fr] lg:py-16">
@@ -47,7 +53,7 @@ export default function HomePage() {
               <CommandLink href="/resume" meta="Hiring surface">
                 Resume and summary
               </CommandLink>
-              <CommandLink href="/intelligence" meta="Editorial system">
+              <CommandLink href="/intelligence" meta="Publishing system">
                 Research, writing, and thinking
               </CommandLink>
               <CommandLink href="/offers" meta="Separate client track">
@@ -57,9 +63,9 @@ export default function HomePage() {
           </div>
           <div className="surface-shell p-6">
             <p className="text-xs uppercase tracking-[0.24em] text-white/42">Latest signal</p>
-            <h2 className="mt-6 font-display text-3xl text-white">{intelligenceEntries[0]?.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-white/62">{intelligenceEntries[0]?.summary}</p>
-            <Link href={`/intelligence/${intelligenceEntries[0]?.slug}`} className="mt-8 inline-flex text-sm text-aurora">
+            <h2 className="mt-6 font-display text-3xl text-white">{featuredEntries[0]?.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-white/62">{featuredEntries[0]?.description}</p>
+            <Link href={`/intelligence/${featuredEntries[0]?.slug}`} className="mt-8 inline-flex text-sm text-aurora">
               Read featured piece
             </Link>
           </div>
@@ -118,11 +124,11 @@ export default function HomePage() {
             <p className="font-display text-xs uppercase tracking-[0.34em] text-azure/80">Research signal</p>
             <h2 className="mt-6 font-display text-4xl text-white">One intelligence layer for frameworks, essays, and clear thinking.</h2>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
-              {intelligenceEntries.slice(0, 2).map((entry) => (
+              {featuredEntries.slice(0, 2).map((entry) => (
                 <Link key={entry.slug} href={`/intelligence/${entry.slug}`} className="rounded-[1.75rem] border border-white/10 bg-black/20 p-5 transition hover:border-azure/30">
-                  <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.type}</p>
+                  <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.category}</p>
                   <h3 className="mt-4 font-display text-2xl text-white">{entry.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-white/62">{entry.summary}</p>
+                  <p className="mt-3 text-sm leading-7 text-white/62">{entry.description}</p>
                 </Link>
               ))}
             </div>
@@ -131,13 +137,13 @@ export default function HomePage() {
           <div className="surface-shell p-8">
             <p className="font-display text-xs uppercase tracking-[0.34em] text-aurora/80">Latest intelligence</p>
             <div className="mt-6 space-y-4">
-              {intelligenceEntries.slice(3, 5).map((entry) => (
+              {latestEntries.slice(0, 2).map((entry) => (
                 <Link key={entry.slug} href={`/intelligence/${entry.slug}`} className="flex items-start justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-black/20 p-4 transition hover:border-aurora/30">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.type}</p>
+                    <p className="text-xs uppercase tracking-[0.22em] text-white/40">{entry.category}</p>
                     <h3 className="mt-3 font-display text-xl text-white">{entry.title}</h3>
                   </div>
-                  <span className="text-sm text-white/40">{entry.readTime}</span>
+                  <span className="text-sm text-white/40">{entry.readingTime}</span>
                 </Link>
               ))}
             </div>

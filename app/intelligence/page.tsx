@@ -1,9 +1,11 @@
 import { Reveal } from "@/components/motion/reveal";
 import { IntelligenceLibrary } from "@/components/site/intelligence-library";
 import { SectionIntro } from "@/components/site/section-intro";
-import { intelligenceEntries } from "@/lib/site-data";
+import { getAllIntelligenceEntries, getIntelligenceTopics } from "@/lib/intelligence";
 
-export default function IntelligencePage() {
+export default async function IntelligencePage() {
+  const [entries, topics] = await Promise.all([getAllIntelligenceEntries(), getIntelligenceTopics()]);
+
   return (
     <div id="main-content" className="mx-auto w-[min(1320px,calc(100%-2rem))] py-12 md:w-[min(1320px,calc(100%-3rem))] md:py-16">
       <Reveal>
@@ -14,7 +16,7 @@ export default function IntelligencePage() {
         />
       </Reveal>
       <Reveal delay={0.06} className="mt-10">
-        <IntelligenceLibrary entries={intelligenceEntries} />
+        <IntelligenceLibrary entries={entries} topics={topics} />
       </Reveal>
     </div>
   );

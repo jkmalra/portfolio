@@ -1,10 +1,10 @@
-import { IntelligenceEntry } from "@/lib/site-data";
+import { IntelligenceFrontmatter } from "@/lib/intelligence";
 
 type ResearchPipelineProps = {
-  current: NonNullable<IntelligenceEntry["pipeline"]>["current"];
+  current: NonNullable<IntelligenceFrontmatter["pipelineCurrent"]>;
 };
 
-const stages: NonNullable<IntelligenceEntry["pipeline"]>["current"][] = [
+const stages: NonNullable<IntelligenceFrontmatter["pipelineCurrent"]>[] = [
   "Idea",
   "Reading",
   "Writing",

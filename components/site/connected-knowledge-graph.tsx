@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { IntelligenceEntry } from "@/lib/site-data";
+import { KnowledgeConnection } from "@/lib/intelligence";
 
 type ConnectedKnowledgeGraphProps = {
-  connections: NonNullable<IntelligenceEntry["knowledgeConnections"]>;
+  connections: KnowledgeConnection[];
   compact?: boolean;
   stopPropagation?: boolean;
 };

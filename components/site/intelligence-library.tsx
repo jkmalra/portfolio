@@ -1,37 +1,32 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { IntelligenceEntry } from "@/lib/site-data";
 import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-graph";
 import { ResearchPipeline } from "@/components/site/research-pipeline";
 import { SystemsAtlas } from "@/components/site/systems-atlas";
+import { IntelligenceEntry } from "@/lib/intelligence";
 
 type IntelligenceLibraryProps = {
   entries: IntelligenceEntry[];
+  topics: string[];
 };
 
-const filterLabels = [
+const primaryFilterOrder = [
   "All",
-  "Research",
-  "Blog",
-  "Thinking",
   "AI Compliance",
-  "Future Technology",
+  "Governance",
   "Systems",
+  "Architecture",
+  "Future Technology",
+  "Software Engineering",
+  "Portfolio Design",
+  "Research",
+  "Open Source",
   "Writing",
+  "Decision Making",
   "Frameworks",
 ] as const;
-
-const laneOrder: IntelligenceEntry["lane"][] = [
-  "Featured frameworks",
-  "Latest writing",
-  "Deep dives",
-  "Research notes",
-  "Thinking and opinions",
-  "Archived content",
-];
 
 function getLayoutClasses(layout: IntelligenceEntry["editorialLayout"]) {
   switch (layout) {
@@ -50,24 +45,42 @@ function getLayoutClasses(layout: IntelligenceEntry["editorialLayout"]) {
   }
 }
 
-function getLaneGridClasses(lane: IntelligenceEntry["lane"]) {
+function getLaneGridClasses(lane: string) {
   switch (lane) {
-    case "Featured frameworks":
-    case "Deep dives":
+    case "Featured content":
+    case "Deep research":
       return "grid gap-4 xl:grid-cols-3";
     case "Latest writing":
       return "grid gap-4 lg:grid-cols-2 xl:grid-cols-3";
-    case "Thinking and opinions":
-      return "grid gap-4 lg:grid-cols-2";
     default:
       return "grid gap-4 lg:grid-cols-2";
   }
 }
 
+function groupEntries(entries: IntelligenceEntry[]) {
+  const featured = entries.filter((entry) => entry.featured || entry.pinned);
+  const latestWriting = entries
+    .filter((entry) => ["Writing", "Essay", "Opinion"].includes(entry.category))
+    .slice(0, 4);
+  const frameworks = entries.filter((entry) => entry.category === "Framework");
+  const research = entries.filter((entry) => entry.category === "Research");
+  const thinking = entries.filter((entry) => ["Thinking", "Note"].includes(entry.category));
+  const archived = entries.filter((entry) => entry.status === "Archived");
+
+  return [
+    { title: "Featured content", entries: featured },
+    { title: "Latest writing", entries: latestWriting },
+    { title: "Frameworks", entries: frameworks },
+    { title: "Deep research", entries: research },
+    { title: "Thinking", entries: thinking },
+    { title: "Archived content", entries: archived },
+  ].filter((group) => group.entries.length > 0);
+}
+
 function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
   const router = useRouter();
   const relationshipCount =
-    (entry.knowledgeConnections?.length ?? 0) + (entry.relatedLinks?.length ?? 0) + (entry.references?.length ?? 0);
+    (entry.knowledgeConnections?.length ?? 0) + entry.relatedArticles.length + entry.relatedFrameworks.length;
 
   return (
     <article
@@ -84,9 +97,8 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
     >
       <div className="flex h-full flex-col gap-5">
         <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/40 transition duration-300 group-hover:text-white/58">
-          <span>{entry.type}</span>
-          <span>{entry.topic}</span>
-          <span>{entry.readTime}</span>
+          <span>{entry.category}</span>
+          <span>{entry.readingTime}</span>
           <span>{entry.status}</span>
         </div>
 
@@ -108,10 +120,10 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
           >
             {entry.title}
           </h4>
-          <p className="max-w-3xl text-sm leading-7 text-white/62">{entry.summary}</p>
+          <p className="max-w-3xl text-sm leading-7 text-white/62">{entry.description}</p>
         </div>
 
-        {entry.pipeline ? <ResearchPipeline current={entry.pipeline.current} /> : null}
+        {entry.pipelineCurrent ? <ResearchPipeline current={entry.pipelineCurrent} /> : null}
 
         {entry.knowledgeConnections && entry.knowledgeConnections.length > 0 ? (
           <div className="rounded-[1.35rem] border border-white/10 bg-black/10 p-3">
@@ -125,7 +137,7 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
 
         <div className="mt-auto flex items-end justify-between gap-4">
           <div className="text-xs uppercase tracking-[0.18em] text-white/36">
-            {entry.knowledgeConnections?.[0]?.kind ?? "Knowledge"} linkage
+            {entry.topics[0] ?? "Knowledge"} focus
           </div>
           <span className="translate-x-0 text-sm text-aurora transition duration-300 group-hover:translate-x-1 group-hover:text-white">
             Open →
@@ -136,9 +148,9 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
   );
 }
 
-export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
+export function IntelligenceLibrary({ entries, topics }: IntelligenceLibraryProps) {
   const [query, setQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<(typeof filterLabels)[number]>("All");
+  const [activeTopic, setActiveTopic] = useState<string>("All");
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [atlasDomain, setAtlasDomain] = useState<string | null>(null);
   const [atlasFilters, setAtlasFilters] = useState<string[]>([]);
@@ -147,51 +159,38 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
     return entries.filter((entry) => {
       const normalized = [
         entry.title,
-        entry.summary,
-        entry.intro,
-        entry.topic,
-        entry.type,
-        entry.tags.join(" "),
+        entry.description,
+        entry.category,
+        entry.topics.join(" "),
         entry.activity,
         entry.freshness,
+        entry.knowledgeConnections?.map((connection) => `${connection.kind} ${connection.label}`).join(" ") ?? "",
       ]
         .join(" ")
         .toLowerCase();
 
       const matchesQuery = normalized.includes(query.toLowerCase());
-      const matchesFilter =
-        activeFilter === "All" ||
-        entry.type === activeFilter ||
-        entry.topic === activeFilter ||
-        entry.tags.includes(activeFilter);
+      const matchesTopic = activeTopic === "All" || entry.topics.includes(activeTopic);
       const matchesAtlas =
         !atlasDomain ||
         atlasFilters.some(
           (filter) =>
-            entry.topic === filter ||
-            entry.type === filter ||
-            entry.tags.includes(filter) ||
+            entry.topics.includes(filter) ||
             entry.activity === filter ||
-            entry.pipeline?.current === filter ||
+            entry.pipelineCurrent === filter ||
             entry.knowledgeConnections?.some(
               (connection) => connection.kind === filter || connection.label.includes(filter),
             ),
         );
       const matchesFeatured = !featuredOnly || entry.featured || entry.pinned;
 
-      return matchesQuery && matchesFilter && matchesAtlas && matchesFeatured;
+      return matchesQuery && matchesTopic && matchesAtlas && matchesFeatured;
     });
-  }, [activeFilter, atlasDomain, atlasFilters, entries, featuredOnly, query]);
+  }, [activeTopic, atlasDomain, atlasFilters, entries, featuredOnly, query]);
 
-  const featuredEntries = visibleEntries.filter((entry) => entry.pinned || entry.featured).slice(0, 3);
-  const groupedEntries = laneOrder
-    .map((lane) => ({
-      lane,
-      entries: visibleEntries.filter((entry) => entry.lane === lane),
-    }))
-    .filter((group) => group.entries.length > 0);
-
+  const groupedEntries = groupEntries(visibleEntries);
   const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
+  const primaryFilters = primaryFilterOrder.filter((filter) => filter === "All" || topics.includes(filter));
 
   return (
     <div className="space-y-10">
@@ -208,7 +207,7 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/42">Filters</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-white/42">Browse by topic</p>
             <button
               type="button"
               onClick={() => setFeaturedOnly((current) => !current)}
@@ -222,13 +221,13 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {filterLabels.map((filter) => (
+            {primaryFilters.map((filter) => (
               <button
                 key={filter}
                 type="button"
-                onClick={() => setActiveFilter(filter)}
+                onClick={() => setActiveTopic(filter)}
                 className={`rounded-full border px-3 py-2 text-xs uppercase tracking-[0.22em] transition ${
-                  activeFilter === filter
+                  activeTopic === filter
                     ? "border-aurora/40 bg-white/[0.09] text-white"
                     : "border-white/10 bg-white/[0.04] text-white/56 hover:text-white"
                 }`}
@@ -244,7 +243,7 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
         <div className="space-y-4">
           <p className="text-xs uppercase tracking-[0.24em] text-white/42">Featured content</p>
           <div className="grid gap-4 xl:grid-cols-2">
-            {featuredEntries.map((entry) => (
+            {groupedEntries.find((group) => group.title === "Featured content")?.entries.map((entry) => (
               <IntelligenceCard key={entry.slug} entry={entry} />
             ))}
           </div>
@@ -283,22 +282,24 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
       </div>
 
       <div className="space-y-8">
-        {groupedEntries.map((group) => (
-          <section key={group.lane} className="space-y-4">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-white/42">Content lane</p>
-                <h3 className="mt-2 font-display text-3xl text-white">{group.lane}</h3>
+        {groupedEntries
+          .filter((group) => group.title !== "Featured content")
+          .map((group) => (
+            <section key={group.title} className="space-y-4">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-white/42">Publishing lane</p>
+                  <h3 className="mt-2 font-display text-3xl text-white">{group.title}</h3>
+                </div>
+                <p className="text-sm text-white/40">{group.entries.length} items</p>
               </div>
-              <p className="text-sm text-white/40">{group.entries.length} items</p>
-            </div>
-            <div className={getLaneGridClasses(group.lane)}>
-              {group.entries.map((entry) => (
-                <IntelligenceCard key={entry.slug} entry={entry} />
-              ))}
-            </div>
-          </section>
-        ))}
+              <div className={getLaneGridClasses(group.title)}>
+                {group.entries.map((entry) => (
+                  <IntelligenceCard key={entry.slug} entry={entry} />
+                ))}
+              </div>
+            </section>
+          ))}
       </div>
     </div>
   );

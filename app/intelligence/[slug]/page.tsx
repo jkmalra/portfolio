@@ -4,10 +4,15 @@ import { Reveal } from "@/components/motion/reveal";
 import { ArticleTools } from "@/components/site/article-tools";
 import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-graph";
 import { ResearchPipeline } from "@/components/site/research-pipeline";
-import { intelligenceEntries } from "@/lib/site-data";
+import {
+  getAllIntelligenceEntries,
+  getIntelligenceEntryBySlug,
+  getRelatedIntelligenceEntries,
+} from "@/lib/intelligence";
 
-export function generateStaticParams() {
-  return intelligenceEntries.map((entry) => ({ slug: entry.slug }));
+export async function generateStaticParams() {
+  const entries = await getAllIntelligenceEntries();
+  return entries.map((entry) => ({ slug: entry.slug }));
 }
 
 export default async function IntelligenceEntryPage({
@@ -16,15 +21,18 @@ export default async function IntelligenceEntryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const currentIndex = intelligenceEntries.findIndex((item) => item.slug === slug);
-  const entry = intelligenceEntries[currentIndex];
+  const entries = await getAllIntelligenceEntries();
+  const currentIndex = entries.findIndex((item) => item.slug === slug);
+  const entry = entries[currentIndex];
 
   if (!entry) {
     notFound();
   }
 
-  const previousEntry = intelligenceEntries[currentIndex - 1];
-  const nextEntry = intelligenceEntries[currentIndex + 1];
+  const article = await getIntelligenceEntryBySlug(slug);
+  const previousEntry = entries[currentIndex - 1];
+  const nextEntry = entries[currentIndex + 1];
+  const relatedEntries = await getRelatedIntelligenceEntries(entry);
 
   return (
     <div id="main-content" className="mx-auto w-[min(1240px,calc(100%-2rem))] py-12 md:w-[min(1240px,calc(100%-3rem))] md:py-16">
@@ -40,9 +48,9 @@ export default async function IntelligenceEntryPage({
             </div>
           </div>
 
-          {entry.pipeline ? (
+          {entry.pipelineCurrent ? (
             <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
-              <ResearchPipeline current={entry.pipeline.current} />
+              <ResearchPipeline current={entry.pipelineCurrent} />
             </div>
           ) : null}
 
@@ -55,7 +63,7 @@ export default async function IntelligenceEntryPage({
 
         <Reveal delay={0.06} className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 md:p-12">
           <p className="font-display text-xs uppercase tracking-[0.34em] text-aurora/75">
-            {entry.type} · {entry.topic} · {entry.readTime} · {entry.date}
+            {entry.category} · {entry.topics.join(" · ")} · {entry.readingTime} · {entry.publishedDate}
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-white/44">
             <span className="rounded-full border border-white/10 px-3 py-1">{entry.activity}</span>
@@ -65,42 +73,26 @@ export default async function IntelligenceEntryPage({
           <h1 className="mt-6 max-w-4xl font-display text-5xl leading-[0.94] text-white md:text-6xl">
             {entry.title}
           </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-white/66">{entry.summary}</p>
+          <p className="mt-6 max-w-3xl text-lg leading-8 text-white/66">{entry.description}</p>
 
           <div className="mt-10 space-y-10">
             <section>
               <p className="text-xs uppercase tracking-[0.24em] text-white/42">Intro</p>
-              <p className="mt-4 text-base leading-8 text-white/74">{entry.intro}</p>
+              <p className="mt-4 text-base leading-8 text-white/74">{article.excerpt}</p>
             </section>
 
             <section>
               <p className="text-xs uppercase tracking-[0.24em] text-white/42">Context</p>
-              <p className="mt-4 text-base leading-8 text-white/74">{entry.context}</p>
+              <p className="mt-4 text-base leading-8 text-white/74">
+                {entry.description}
+              </p>
             </section>
 
             <section>
               <p className="text-xs uppercase tracking-[0.24em] text-white/42">Main body</p>
-              <div className="mt-4 space-y-6 text-base leading-8 text-white/74">
-                {entry.body.map((paragraph, index) => (
-                  <div
-                    key={paragraph}
-                    className={index === 1 ? "rounded-[1.5rem] border border-white/10 bg-black/20 p-5" : undefined}
-                  >
-                    <p>{paragraph}</p>
-                  </div>
-                ))}
+              <div className="prose prose-invert mt-4 max-w-none prose-p:text-base prose-p:leading-8 prose-headings:font-[var(--font-space-grotesk)] prose-headings:text-white prose-strong:text-white prose-li:text-white/74">
+                {article.content}
               </div>
-            </section>
-
-            <section>
-              <p className="text-xs uppercase tracking-[0.24em] text-white/42">Key takeaways</p>
-              <ul className="mt-4 space-y-4 text-base leading-8 text-white/74">
-                {entry.keyTakeaways.map((item) => (
-                  <li key={item} className="rounded-[1.5rem] border border-white/10 bg-black/20 p-4">
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </section>
 
             {entry.knowledgeConnections && entry.knowledgeConnections.length > 0 ? (
@@ -109,14 +101,21 @@ export default async function IntelligenceEntryPage({
               </section>
             ) : null}
 
-            {entry.references && entry.references.length > 0 ? (
+            {relatedEntries.length > 0 ? (
               <section>
-                <p className="text-xs uppercase tracking-[0.24em] text-white/42">References</p>
-                <ul className="mt-4 space-y-3 text-sm leading-7 text-white/60">
-                  {entry.references.map((reference) => (
-                    <li key={reference}>{reference}</li>
+                <p className="text-xs uppercase tracking-[0.24em] text-white/42">Related articles</p>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  {relatedEntries.map((relatedEntry) => (
+                    <Link
+                      key={relatedEntry.slug}
+                      href={`/intelligence/${relatedEntry.slug}`}
+                      className="rounded-[1.5rem] border border-white/10 bg-black/20 p-4 transition hover:border-white/20"
+                    >
+                      <p className="text-xs uppercase tracking-[0.22em] text-white/40">{relatedEntry.category}</p>
+                      <p className="mt-3 font-display text-2xl text-white">{relatedEntry.title}</p>
+                    </Link>
                   ))}
-                </ul>
+                </div>
               </section>
             ) : null}
 
