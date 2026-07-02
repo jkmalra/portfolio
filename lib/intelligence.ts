@@ -156,6 +156,15 @@ export async function getEntriesByTopic(topic: string) {
   return entries.filter((entry) => entry.topics.includes(topic));
 }
 
+export function topicToSlug(topic: string) {
+  return topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export async function getTopicFromSlug(slug: string) {
+  const topics = await getIntelligenceTopics();
+  return topics.find((topic) => topicToSlug(topic) === slug) ?? null;
+}
+
 export async function getRelatedIntelligenceEntries(entry: IntelligenceEntry, limit = 3) {
   const entries = await getAllIntelligenceEntries();
 

@@ -10,6 +10,7 @@ import { IntelligenceEntry } from "@/lib/intelligence";
 type IntelligenceLibraryProps = {
   entries: IntelligenceEntry[];
   topics: string[];
+  initialTopic?: string;
 };
 
 const primaryFilterOrder = [
@@ -148,9 +149,9 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
   );
 }
 
-export function IntelligenceLibrary({ entries, topics }: IntelligenceLibraryProps) {
+export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: IntelligenceLibraryProps) {
   const [query, setQuery] = useState("");
-  const [activeTopic, setActiveTopic] = useState<string>("All");
+  const [activeTopic, setActiveTopic] = useState<string>(initialTopic);
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [atlasDomain, setAtlasDomain] = useState<string | null>(null);
   const [atlasFilters, setAtlasFilters] = useState<string[]>([]);
