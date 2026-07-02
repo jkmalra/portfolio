@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ProjectContent } from "@/lib/project-content";
+import { ProjectEntry } from "@/lib/project-content";
 import { ProjectStatusBadge } from "@/components/site/project-status-badge";
 import { ProjectTagList } from "@/components/site/project-tag-list";
 
 type ProjectCardProps = {
-  project: ProjectContent;
+  project: ProjectEntry;
   compact?: boolean;
 };
 
@@ -33,7 +33,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-white/36">
-        <span>{project.stage}</span>
+        <span>{project.started}</span>
         <span>{project.role}</span>
       </div>
 
@@ -42,7 +42,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
       </div>
 
       <div className={`mt-8 grid gap-4 ${isFlagship ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-        {project.metrics.slice(0, isFlagship ? 3 : 2).map((metric) => (
+        {(project.metrics ?? []).slice(0, isFlagship ? 3 : 2).map((metric) => (
           <div key={metric.label} className="rounded-[1.35rem] border border-white/10 bg-black/20 p-4">
             <p className="font-display text-2xl text-white">{metric.value}</p>
             <p className="mt-2 text-sm leading-6 text-white/56">{metric.label}</p>

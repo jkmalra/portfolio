@@ -9,11 +9,12 @@ import { getAllProjects } from "@/lib/project-content";
 import { featuredSignals, proofPoints, resumeSummary } from "@/lib/site-data";
 
 export default async function HomePage() {
-  const projects = getAllProjects().slice(0, 3);
-  const [featuredEntries, latestEntries] = await Promise.all([
+  const [featuredEntries, latestEntries, allProjects] = await Promise.all([
     getFeaturedIntelligenceEntries(),
     getLatestIntelligenceEntries(5),
+    getAllProjects(),
   ]);
+  const projects = allProjects.slice(0, 3);
 
   return (
     <div id="main-content">

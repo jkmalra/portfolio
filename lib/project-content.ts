@@ -112,7 +112,7 @@ export async function getProjectTags() {
   );
 }
 
-export async function getRelatedProjects(project: ProjectEntry, limit = 3) {
+export async function getRelatedProjects(project: Pick<ProjectFrontmatter, "slug" | "category" | "tags" | "relatedProjects">, limit = 3) {
   const projects = await getAllProjects();
 
   return projects

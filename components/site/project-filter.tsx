@@ -2,17 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { ProjectCard } from "@/components/site/project-card";
-import { ProjectContent, ProjectStatus } from "@/lib/project-content";
+import { ProjectEntry, ProjectStatus } from "@/lib/project-content";
 
 type ProjectFilterProps = {
-  projects: ProjectContent[];
+  projects: ProjectEntry[];
 };
 
 type SortMode = "Priority" | "Newest stage" | "Status";
 
 const sectionOrder = ["Featured Projects", "Active Work", "Experiments / Learning"] as const;
 
-function groupProjects(projects: ProjectContent[]) {
+function groupProjects(projects: ProjectEntry[]) {
   return {
     "Featured Projects": projects.filter((project) => project.tier === "Tier 1"),
     "Active Work": projects.filter((project) => project.tier === "Tier 2"),
@@ -20,7 +20,7 @@ function groupProjects(projects: ProjectContent[]) {
   };
 }
 
-function sortProjects(projects: ProjectContent[], mode: SortMode) {
+function sortProjects(projects: ProjectEntry[], mode: SortMode) {
   const items = [...projects];
 
   if (mode === "Status") {
@@ -28,10 +28,10 @@ function sortProjects(projects: ProjectContent[], mode: SortMode) {
   }
 
   if (mode === "Newest stage") {
-    return items.sort((left, right) => right.year.localeCompare(left.year));
+    return items.sort((left, right) => new Date(right.updated).getTime() - new Date(left.updated).getTime());
   }
 
-  return items.sort((left, right) => left.sortOrder - right.sortOrder);
+  return items;
 }
 
 export function ProjectFilter({ projects }: ProjectFilterProps) {
@@ -51,7 +51,7 @@ export function ProjectFilter({ projects }: ProjectFilterProps) {
           project.summary,
           project.category,
           project.status,
-          project.stage,
+          project.positioning,
           project.stack.join(" "),
           project.tags.join(" "),
         ]

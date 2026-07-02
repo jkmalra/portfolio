@@ -3,8 +3,8 @@ import { ProjectFilter } from "@/components/site/project-filter";
 import { SectionIntro } from "@/components/site/section-intro";
 import { getAllProjects } from "@/lib/project-content";
 
-export default function ProjectsPage() {
-  const projects = getAllProjects();
+export default async function ProjectsPage() {
+  const projects = await getAllProjects();
 
   return (
     <div id="main-content" className="mx-auto w-[min(1320px,calc(100%-2rem))] py-12 md:w-[min(1320px,calc(100%-3rem))] md:py-16">
