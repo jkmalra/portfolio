@@ -1,16 +1,18 @@
 import { Reveal } from "@/components/motion/reveal";
 import { ProjectFilter } from "@/components/site/project-filter";
 import { SectionIntro } from "@/components/site/section-intro";
-import { projects } from "@/lib/site-data";
+import { getAllProjects } from "@/lib/project-content";
 
 export default function ProjectsPage() {
+  const projects = getAllProjects();
+
   return (
     <div id="main-content" className="mx-auto w-[min(1320px,calc(100%-2rem))] py-12 md:w-[min(1320px,calc(100%-3rem))] md:py-16">
       <Reveal>
         <SectionIntro
-          eyebrow="Projects hub"
-          title="A project index built like a future proof console."
-          description="All work lives here as a navigable index. Open any dossier for the full narrative, metrics, interactive proof area, and links to code, live demos, and supporting research."
+          eyebrow="Projects"
+          title="A curated index of proof surfaces, not a wall of portfolio thumbnails."
+          description="This section is organized as a serious project library. Flagship dossiers lead, active supporting work follows, and smaller experiments stay present without competing for equal weight."
         />
       </Reveal>
       <Reveal delay={0.06} className="mt-10">
