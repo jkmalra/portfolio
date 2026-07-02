@@ -1,164 +1,123 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
-import { AtlasEdge } from "@/components/site/atlas-edge";
-import { AtlasNode } from "@/components/site/atlas-node";
-import { FocusedDomainPanel } from "@/components/site/focused-domain-panel";
-import { IntelligenceEntry } from "@/lib/intelligence";
+import { motion } from "framer-motion";
 import { atlasDomains, getAtlasDomainByTitle } from "@/lib/systems-atlas";
 
 type AtlasDomainTitle = (typeof atlasDomains)[number]["title"];
 
 type SystemsAtlasProps = {
   activeDomain: AtlasDomainTitle | null;
-  entries: IntelligenceEntry[];
-  onSelect: (domain: AtlasDomainTitle | null, filters: string[]) => void;
+  onOpenContent: () => void;
+  onSelect: (domain: AtlasDomainTitle, filters: string[]) => void;
 };
 
-function entryMatchesFilters(entry: IntelligenceEntry, filters: string[]) {
-  return filters.some(
-    (filter) =>
-      entry.topics.includes(filter) ||
-      entry.activity === filter ||
-      entry.pipelineCurrent === filter ||
-      entry.knowledgeConnections?.some((connection) => connection.kind === filter || connection.label.includes(filter)),
+function DetailList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">{title}</p>
+      <div className="mt-3 space-y-2">
+        {items.map((item) => (
+          <p key={item} className="text-sm leading-6 text-white/66">
+            {item}
+          </p>
+        ))}
+      </div>
+    </div>
   );
 }
 
-export function SystemsAtlas({ activeDomain, entries, onSelect }: SystemsAtlasProps) {
-  const [expandedDomain, setExpandedDomain] = useState<AtlasDomainTitle>(activeDomain ?? atlasDomains[0].title);
-  const [activeNodeId, setActiveNodeId] = useState<string>(getAtlasDomainByTitle(activeDomain ?? atlasDomains[0].title).branch[0].id);
-
-  const domain = useMemo(() => {
-    return getAtlasDomainByTitle(activeDomain ?? expandedDomain);
-  }, [activeDomain, expandedDomain]);
-
-  const activeNode = domain.branch.find((node) => node.id === activeNodeId) ?? domain.branch[0];
-  const activeIndex = domain.branch.findIndex((node) => node.id === activeNode.id);
-
-  const metrics = useMemo(() => {
-    const relatedEntries = entries.filter((entry) => entryMatchesFilters(entry, activeNode.filters));
-    const projectCount = relatedEntries.filter(
-      (entry) =>
-        entry.relatedProjects.length > 0 ||
-        entry.knowledgeConnections?.some((connection) => connection.kind === "Projects"),
-    ).length;
-    const frameworkCount = relatedEntries.filter(
-      (entry) =>
-        entry.relatedFrameworks.length > 0 ||
-        entry.knowledgeConnections?.some((connection) => connection.kind === "Frameworks"),
-    ).length;
-
-    return {
-      relatedCount: relatedEntries.length,
-      projectCount,
-      frameworkCount,
-    };
-  }, [activeNode.filters, entries]);
+export function SystemsAtlas({ activeDomain, onOpenContent, onSelect }: SystemsAtlasProps) {
+  const selectedDomain = getAtlasDomainByTitle(activeDomain);
 
   return (
     <aside className="rounded-[1.9rem] border border-white/10 bg-white/[0.04] p-6 lg:p-7">
-      <div className="flex items-start justify-between gap-4">
-        <div className="max-w-2xl">
-          <p className="text-xs uppercase tracking-[0.24em] text-white/42">Systems Atlas</p>
-          <h3 className="mt-4 font-display text-3xl text-white">
-            One domain at a time, with the next layer revealed only when needed.
-          </h3>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/62">
-            The Atlas is a knowledge operating surface. Start with a major domain, then move deeper into the
-            branch to surface connected research, projects, and frameworks.
-          </p>
-        </div>
-        {activeDomain ? (
-          <button
-            type="button"
-            onClick={() => {
-              setExpandedDomain(atlasDomains[0].title);
-              setActiveNodeId(atlasDomains[0].branch[0].id);
-              onSelect(null, []);
-            }}
-            className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.2em] text-white/56 transition hover:text-white"
-          >
-            Clear
-          </button>
-        ) : null}
+      <div className="max-w-3xl">
+        <p className="text-xs uppercase tracking-[0.24em] text-white/42">Systems Atlas</p>
+        <h3 className="mt-4 font-display text-3xl text-white">A calm domain explorer for connected knowledge.</h3>
+        <p className="mt-4 text-sm leading-7 text-white/62">
+          Choose one knowledge domain from the left. The right panel stays focused on that domain&apos;s
+          current relevance, connected work, and the next content worth opening.
+        </p>
       </div>
 
-      <div className="mt-8 grid gap-5 xl:grid-cols-[340px,minmax(0,1fr)]">
-        <div className="rounded-[1.7rem] border border-white/10 bg-black/15 p-4">
+      <div className="mt-8 grid gap-5 xl:grid-cols-[280px,minmax(0,1fr)]">
+        <nav className="rounded-[1.7rem] border border-white/10 bg-black/15 p-4" aria-label="Knowledge domains">
           <p className="text-[11px] uppercase tracking-[0.22em] text-white/36">Knowledge domains</p>
           <div className="mt-4 space-y-2">
-            {atlasDomains.map((item) => {
-              const selected = item.title === domain.title;
-              const subdued = !selected && activeDomain !== null;
+            {atlasDomains.map((domain) => {
+              const active = domain.title === selectedDomain.title;
 
               return (
-                <AtlasNode
-                  key={item.id}
-                  node={item.branch[0]}
-                  selected={selected}
-                  subdued={subdued}
-                  onClick={() => {
-                    setExpandedDomain(item.title);
-                    setActiveNodeId(item.branch[0].id);
-                    onSelect(item.title, item.branch[0].filters);
-                  }}
-                />
+                <motion.button
+                  key={domain.id}
+                  type="button"
+                  whileHover={{ y: -1 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                  onClick={() => onSelect(domain.title, domain.filters)}
+                  className={`flex w-full items-center justify-between gap-3 rounded-[1.2rem] border px-4 py-3 text-left transition duration-300 ${
+                    active
+                      ? "border-aurora/35 bg-white/[0.08] text-white"
+                      : "border-white/10 bg-white/[0.03] text-white/58 hover:border-white/18 hover:text-white"
+                  }`}
+                >
+                  <span className="min-w-0 truncate font-display text-lg">{domain.title}</span>
+                  <span className="shrink-0 text-[10px] uppercase tracking-[0.18em] text-white/34">
+                    {domain.eyebrow}
+                  </span>
+                </motion.button>
               );
             })}
           </div>
-        </div>
+        </nav>
 
-        <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr),340px]">
-          <div className="rounded-[1.7rem] border border-white/10 bg-black/15 p-5 md:p-6">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.22em] text-white/36">{domain.eyebrow}</p>
-                <h4 className="mt-3 font-display text-3xl text-white">{domain.title}</h4>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-white/58">{domain.summary}</p>
+        <section className="rounded-[1.7rem] border border-white/10 bg-black/15 p-5 md:p-6">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr),minmax(280px,0.85fr)]">
+            <div className="min-w-0">
+              <p className="text-[11px] uppercase tracking-[0.22em] text-white/36">{selectedDomain.eyebrow}</p>
+              <h4 className="mt-3 break-words font-display text-3xl text-white">{selectedDomain.title}</h4>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/62">{selectedDomain.description}</p>
+
+              <div className="mt-6 rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Current focus</p>
+                <p className="mt-3 text-sm leading-7 text-white/66">{selectedDomain.currentFocus}</p>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {selectedDomain.filters.map((filter) => (
+                  <span
+                    key={filter}
+                    className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/46"
+                  >
+                    {filter}
+                  </span>
+                ))}
               </div>
             </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={domain.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                className="mt-8"
-              >
-                <div className="space-y-0">
-                  {domain.branch.map((node, index) => (
-                    <div key={node.id}>
-                      <AtlasNode
-                        node={node}
-                        active={activeNodeId === node.id || index < activeIndex}
-                        selected={activeNodeId === node.id}
-                        subdued={index > activeIndex + 1}
-                        onClick={() => {
-                          setExpandedDomain(domain.title);
-                          setActiveNodeId(node.id);
-                          onSelect(domain.title, node.filters);
-                        }}
-                      />
-                      {index < domain.branch.length - 1 ? <AtlasEdge active={index < activeIndex} /> : null}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </AnimatePresence>
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+              <DetailList title="Related projects" items={selectedDomain.relatedProjects} />
+              <DetailList title="Related research" items={selectedDomain.relatedResearch} />
+              <DetailList title="Related frameworks" items={selectedDomain.relatedFrameworks} />
+              <DetailList title="Related standards" items={selectedDomain.relatedStandards} />
+            </div>
           </div>
 
-          <FocusedDomainPanel
-            domain={domain}
-            activeNode={activeNode}
-            relatedCount={metrics.relatedCount}
-            projectCount={metrics.projectCount}
-            frameworkCount={metrics.frameworkCount}
-          />
-        </div>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-[1.35rem] border border-white/10 bg-white/[0.03] px-4 py-4">
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Open next</p>
+              <p className="mt-2 truncate text-sm text-white/62">
+                Explore Intelligence content related to {selectedDomain.title}.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onOpenContent}
+              className="shrink-0 rounded-full border border-aurora/30 bg-white/[0.06] px-4 py-3 text-[11px] uppercase tracking-[0.2em] text-white transition hover:border-aurora/45 hover:bg-white/[0.1]"
+            >
+              Open related content
+            </button>
+          </div>
+        </section>
       </div>
     </aside>
   );

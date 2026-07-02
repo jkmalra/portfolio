@@ -6,6 +6,7 @@ import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-g
 import { ResearchPipeline } from "@/components/site/research-pipeline";
 import { SystemsAtlas } from "@/components/site/systems-atlas";
 import { IntelligenceEntry } from "@/lib/intelligence";
+import { getAtlasDomainByTitle } from "@/lib/systems-atlas";
 
 type IntelligenceLibraryProps = {
   entries: IntelligenceEntry[];
@@ -172,11 +173,12 @@ function IntelligenceCard({
 }
 
 export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: IntelligenceLibraryProps) {
+  const defaultAtlasDomain = getAtlasDomainByTitle("AI Compliance");
   const [query, setQuery] = useState("");
   const [activeTopic, setActiveTopic] = useState<string>(initialTopic);
   const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [atlasDomain, setAtlasDomain] = useState<string | null>(null);
-  const [atlasFilters, setAtlasFilters] = useState<string[]>([]);
+  const [atlasDomain, setAtlasDomain] = useState<string>(defaultAtlasDomain.title);
+  const [atlasFilters, setAtlasFilters] = useState<string[]>(defaultAtlasDomain.filters);
 
   const primaryFilters = primaryFilterOrder.filter((filter) => filter === "All" || topics.includes(filter));
 
@@ -216,7 +218,7 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
   const groupedEntries = groupEntries(visibleEntries);
   const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
   const atlasMatchedSlugs = useMemo(() => {
-    if (!atlasDomain) {
+    if (!atlasDomain || atlasFilters.length === 0) {
       return new Set<string>();
     }
 
@@ -292,19 +294,14 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
             | "Systems Design"
             | "Future Technology"
             | "Research"
-            | "Architecture"
             | "Writing"
-            | "Decision Making"
-            | "Projects"
-            | null}
-          entries={entries}
+            | "Frameworks"}
+          onOpenContent={() => {
+            document.getElementById("intelligence-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
           onSelect={(domain, filters) => {
             setAtlasDomain(domain);
             setAtlasFilters(filters);
-
-            if (!domain) {
-              return;
-            }
 
             const matchingPrimaryTopic = filters.find((filter) =>
               primaryFilters.includes(filter as (typeof primaryFilterOrder)[number]),
@@ -318,11 +315,9 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {atlasDomain ? (
-          <span className="rounded-full border border-aurora/25 bg-white/[0.06] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/62">
-            Atlas focus: {atlasDomain}
-          </span>
-        ) : null}
+        <span className="rounded-full border border-aurora/25 bg-white/[0.06] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/62">
+          Atlas focus: {atlasDomain}
+        </span>
         {liveSignals.map((signal) => (
           <span
             key={signal}
@@ -333,7 +328,7 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
         ))}
       </div>
 
-      <div className="space-y-8">
+      <div id="intelligence-results" className="space-y-8">
         {groupedEntries
           .filter((group) => group.title !== "Featured content")
           .map((group) => (
