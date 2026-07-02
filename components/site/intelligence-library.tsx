@@ -141,7 +141,7 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
             {entry.topics[0] ?? "Knowledge"} focus
           </div>
           <span className="translate-x-0 text-sm text-aurora transition duration-300 group-hover:translate-x-1 group-hover:text-white">
-            Open →
+            Open -&gt;
           </span>
         </div>
       </div>
@@ -155,6 +155,8 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [atlasDomain, setAtlasDomain] = useState<string | null>(null);
   const [atlasFilters, setAtlasFilters] = useState<string[]>([]);
+
+  const primaryFilters = primaryFilterOrder.filter((filter) => filter === "All" || topics.includes(filter));
 
   const visibleEntries = useMemo(() => {
     return entries.filter((entry) => {
@@ -191,7 +193,6 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
 
   const groupedEntries = groupEntries(visibleEntries);
   const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
-  const primaryFilters = primaryFilterOrder.filter((filter) => filter === "All" || topics.includes(filter));
 
   return (
     <div className="space-y-10">
@@ -240,7 +241,7 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.08fr,0.92fr]">
+      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.08fr),minmax(0,0.92fr)]">
         <div className="space-y-4">
           <p className="text-xs uppercase tracking-[0.24em] text-white/42">Featured content</p>
           <div className="grid gap-4 xl:grid-cols-2">
@@ -265,6 +266,18 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
           onSelect={(domain, filters) => {
             setAtlasDomain(domain);
             setAtlasFilters(filters);
+
+            if (!domain) {
+              return;
+            }
+
+            const matchingPrimaryTopic = filters.find((filter) =>
+              primaryFilters.includes(filter as (typeof primaryFilterOrder)[number]),
+            );
+
+            if (matchingPrimaryTopic) {
+              setActiveTopic(matchingPrimaryTopic);
+            }
           }}
         />
       </div>
@@ -276,7 +289,10 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
           </span>
         ) : null}
         {liveSignals.map((signal) => (
-          <span key={signal} className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/44">
+          <span
+            key={signal}
+            className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/44"
+          >
             {signal}
           </span>
         ))}

@@ -1,0 +1,76 @@
+
+> jas-malra-portfolio@0.2.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use by process 15084, using available port 3001 instead.
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.2:3001
+
+ ✓ Starting...
+ ✓ Ready in 3.5s
+ ○ Compiling /intelligence ...
+ ✓ Compiled /intelligence in 2.5s (1631 modules)
+ GET /intelligence 200 in 4555ms
+ GET /intelligence 200 in 310ms
+ ✓ Compiled in 3.2s (1645 modules)
+ GET /intelligence 200 in 343ms
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3792760608'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '3129138478'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '729973920'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '729973920'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '729973920'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '729973920'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3792760608'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3792760608'
+}
+ ⨯ [TypeError: Cannot read properties of undefined (reading 'call')] {
+  digest: '2574773133'
+}
+ ⨯ Error: Could not find the module "C:\Users\HP\Desktop\career_learning\dev\projects\portfolio\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3792760608'
+}
+[TypeError: Cannot read properties of undefined (reading 'call')]
+ ⨯ [TypeError: Cannot read properties of undefined (reading 'call')]
+ ⨯ [TypeError: Cannot read properties of undefined (reading 'call')] {
+  page: '/intelligence'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1761ms (1978 modules)
+ GET /intelligence 200 in 1728ms
+ GET /intelligence 500 in 5771ms
+ GET /intelligence 200 in 295ms

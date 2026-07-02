@@ -83,15 +83,15 @@ const atlasNodes: AtlasNode[] = [
 ];
 
 const nodePositions: Record<AtlasDomain, string> = {
-  "AI Compliance": "md:col-start-2 md:row-start-1",
-  "Software Engineering": "md:col-start-5 md:row-start-1",
-  "Systems Design": "md:col-start-3 md:row-start-2",
-  "Future Technology": "md:col-start-6 md:row-start-2",
+  "AI Compliance": "md:col-start-1 md:row-start-1",
+  "Software Engineering": "md:col-start-3 md:row-start-1",
+  "Systems Design": "md:col-start-1 md:row-start-2",
+  "Future Technology": "md:col-start-3 md:row-start-2",
   Research: "md:col-start-1 md:row-start-3",
-  Architecture: "md:col-start-2 md:row-start-4",
-  Writing: "md:col-start-5 md:row-start-4",
-  "Decision Making": "md:col-start-3 md:row-start-5",
-  Projects: "md:col-start-6 md:row-start-5",
+  Architecture: "md:col-start-3 md:row-start-3",
+  Writing: "md:col-start-1 md:row-start-4",
+  "Decision Making": "md:col-start-2 md:row-start-4",
+  Projects: "md:col-start-3 md:row-start-4",
 };
 
 export function SystemsAtlas({ activeDomain, onSelect }: SystemsAtlasProps) {
@@ -102,12 +102,13 @@ export function SystemsAtlas({ activeDomain, onSelect }: SystemsAtlasProps) {
   }, [activeDomain, hoveredDomain]);
 
   return (
-    <aside className="rounded-[1.85rem] border border-white/10 bg-white/[0.04] p-6">
+    <aside className="rounded-[1.85rem] border border-white/10 bg-white/[0.04] p-6 lg:p-7">
       <div className="flex items-start justify-between gap-4">
         <div className="max-w-md">
           <p className="text-xs uppercase tracking-[0.24em] text-white/42">Systems Atlas</p>
           <p className="mt-4 text-sm leading-7 text-white/62">
-            A visual map of how the portfolio’s knowledge domains connect. Select a node to shift the page toward related work.
+            A visual map of how the portfolio&apos;s knowledge domains connect. Select a node to shift the
+            page toward related work.
           </p>
         </div>
         {activeDomain ? (
@@ -121,23 +122,22 @@ export function SystemsAtlas({ activeDomain, onSelect }: SystemsAtlasProps) {
         ) : null}
       </div>
 
-      <div className="mt-8 grid gap-5 xl:grid-cols-[1.15fr,0.85fr]">
+      <div className="mt-8 grid gap-5 2xl:grid-cols-[minmax(0,1fr),320px]">
         <div className="relative overflow-hidden rounded-[1.7rem] border border-white/8 bg-black/15 p-4 md:p-6">
           <div className="pointer-events-none absolute inset-0 hidden md:block">
-            <div className="absolute left-[18%] top-[18%] h-px w-[28%] bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-            <div className="absolute left-[49%] top-[18%] h-px w-[20%] bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-            <div className="absolute left-[31%] top-[34%] h-px w-[16%] bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-            <div className="absolute left-[48%] top-[34%] h-px w-[20%] bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-            <div className="absolute left-[18%] top-[66%] h-px w-[18%] bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-            <div className="absolute left-[53%] top-[66%] h-px w-[15%] bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-            <div className="absolute left-[33%] top-[78%] h-px w-[30%] bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+            <div className="absolute left-1/2 top-[24%] h-[44%] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+            <div className="absolute left-[18%] right-[18%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="absolute left-[28%] top-[31%] h-px w-[19%] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="absolute right-[28%] top-[31%] h-px w-[19%] bg-gradient-to-l from-transparent via-white/10 to-transparent" />
+            <div className="absolute left-[28%] top-[68%] h-px w-[19%] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="absolute right-[28%] top-[68%] h-px w-[19%] bg-gradient-to-l from-transparent via-white/10 to-transparent" />
           </div>
 
-          <div className="grid gap-3 md:grid-cols-6 md:grid-rows-5">
-            <div className="order-1 rounded-[1.4rem] border border-aurora/16 bg-white/[0.05] p-4 md:col-start-3 md:row-start-3 md:row-span-2 md:flex md:min-h-[132px] md:flex-col md:justify-between">
+          <div className="grid gap-3 md:grid-cols-3 md:grid-rows-4">
+            <div className="order-1 rounded-[1.4rem] border border-aurora/16 bg-white/[0.05] p-4 md:col-start-2 md:row-start-2 md:row-span-2 md:flex md:min-h-[180px] md:flex-col md:justify-between">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.22em] text-white/36">Core</p>
-                <h3 className="mt-3 font-display text-2xl text-white">Knowledge System</h3>
+                <h3 className="mt-3 font-display text-2xl text-white lg:text-[2rem]">Knowledge System</h3>
               </div>
               <p className="mt-4 text-sm leading-6 text-white/50">
                 Connected ideas become filters, articles, projects, and proof.
@@ -157,7 +157,7 @@ export function SystemsAtlas({ activeDomain, onSelect }: SystemsAtlasProps) {
                   onFocus={() => setHoveredDomain(node.domain)}
                   onBlur={() => setHoveredDomain(null)}
                   onClick={() => onSelect(active ? null : node.domain, active ? [] : node.filters)}
-                  className={`rounded-[1.35rem] border p-4 text-left transition duration-300 ${nodePositions[node.domain]} ${
+                  className={`rounded-[1.35rem] border p-4 text-left transition duration-300 md:min-h-[126px] ${nodePositions[node.domain]} ${
                     active || hovered
                       ? "border-aurora/35 bg-white/[0.08] shadow-[0_0_0_1px_rgba(159,245,210,0.05)]"
                       : "border-white/10 bg-white/[0.03] hover:border-white/18 hover:bg-white/[0.05]"
