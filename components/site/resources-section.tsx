@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { ProjectResource } from "@/lib/project-content";
 
 type ResourcesSectionProps = {
-  resources: ProjectResource[];
+  resources: { label: string; href: string }[];
 };
 
 export function ResourcesSection({ resources }: ResourcesSectionProps) {
