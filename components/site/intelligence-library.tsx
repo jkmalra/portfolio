@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { IntelligenceEntry } from "@/lib/site-data";
 import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-graph";
 import { ResearchPipeline } from "@/components/site/research-pipeline";
+import { SystemsAtlas } from "@/components/site/systems-atlas";
 
 type IntelligenceLibraryProps = {
   entries: IntelligenceEntry[];
@@ -139,6 +140,8 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<(typeof filterLabels)[number]>("All");
   const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [atlasDomain, setAtlasDomain] = useState<string | null>(null);
+  const [atlasFilters, setAtlasFilters] = useState<string[]>([]);
 
   const visibleEntries = useMemo(() => {
     return entries.filter((entry) => {
@@ -161,11 +164,24 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
         entry.type === activeFilter ||
         entry.topic === activeFilter ||
         entry.tags.includes(activeFilter);
+      const matchesAtlas =
+        !atlasDomain ||
+        atlasFilters.some(
+          (filter) =>
+            entry.topic === filter ||
+            entry.type === filter ||
+            entry.tags.includes(filter) ||
+            entry.activity === filter ||
+            entry.pipeline?.current === filter ||
+            entry.knowledgeConnections?.some(
+              (connection) => connection.kind === filter || connection.label.includes(filter),
+            ),
+        );
       const matchesFeatured = !featuredOnly || entry.featured || entry.pinned;
 
-      return matchesQuery && matchesFilter && matchesFeatured;
+      return matchesQuery && matchesFilter && matchesAtlas && matchesFeatured;
     });
-  }, [activeFilter, entries, featuredOnly, query]);
+  }, [activeFilter, atlasDomain, atlasFilters, entries, featuredOnly, query]);
 
   const featuredEntries = visibleEntries.filter((entry) => entry.pinned || entry.featured).slice(0, 3);
   const groupedEntries = laneOrder
@@ -175,9 +191,6 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
     }))
     .filter((group) => group.entries.length > 0);
 
-  const majorConnections = Array.from(
-    new Set(entries.flatMap((entry) => (entry.knowledgeConnections ?? []).map((connection) => connection.kind))),
-  );
   const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
 
   return (
@@ -237,38 +250,36 @@ export function IntelligenceLibrary({ entries }: IntelligenceLibraryProps) {
           </div>
         </div>
 
-        <aside className="rounded-[1.85rem] border border-white/10 bg-white/[0.04] p-6">
-          <p className="text-xs uppercase tracking-[0.24em] text-white/42">Signal map</p>
-          <p className="mt-4 text-sm leading-7 text-white/62">
-            This is the intellectual layer of the portfolio: research, public writing, and personal thinking arranged as one editorial system.
-          </p>
-          <div className="mt-8 space-y-3">
-            <p className="text-xs uppercase tracking-[0.22em] text-white/36">Living activity</p>
-            <div className="flex flex-wrap gap-2">
-              {liveSignals.map((signal) => (
-                <span key={signal} className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/50">
-                  {signal}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-2">
-            {majorConnections.map((kind) => (
-              <button
-                key={kind}
-                type="button"
-                onClick={() => setQuery(kind)}
-                className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/50 transition hover:text-white"
-              >
-                {kind}
-              </button>
-            ))}
-          </div>
-          <div className="mt-8 space-y-3 text-sm text-white/54">
-            <p>Featured content appears first, then recent updates, then deeper frameworks and notes.</p>
-            <p>Activity and pipeline signals show how ideas move toward publication and project application.</p>
-          </div>
-        </aside>
+        <SystemsAtlas
+          activeDomain={atlasDomain as
+            | "AI Compliance"
+            | "Software Engineering"
+            | "Systems Design"
+            | "Future Technology"
+            | "Research"
+            | "Architecture"
+            | "Writing"
+            | "Decision Making"
+            | "Projects"
+            | null}
+          onSelect={(domain, filters) => {
+            setAtlasDomain(domain);
+            setAtlasFilters(filters);
+          }}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {atlasDomain ? (
+          <span className="rounded-full border border-aurora/25 bg-white/[0.06] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/62">
+            Atlas focus: {atlasDomain}
+          </span>
+        ) : null}
+        {liveSignals.map((signal) => (
+          <span key={signal} className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/44">
+            {signal}
+          </span>
+        ))}
       </div>
 
       <div className="space-y-8">
