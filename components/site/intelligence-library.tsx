@@ -4,9 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ConnectedKnowledgeGraph } from "@/components/site/connected-knowledge-graph";
 import { ResearchPipeline } from "@/components/site/research-pipeline";
-import { SystemsAtlas } from "@/components/site/systems-atlas";
 import { IntelligenceEntry } from "@/lib/intelligence";
-import { getAtlasDomainByTitle } from "@/lib/systems-atlas";
 
 type IntelligenceLibraryProps = {
   entries: IntelligenceEntry[];
@@ -79,24 +77,10 @@ function groupEntries(entries: IntelligenceEntry[]) {
   ].filter((group) => group.entries.length > 0);
 }
 
-function entryMatchesAtlas(entry: IntelligenceEntry, atlasFilters: string[]) {
-  return atlasFilters.some(
-    (filter) =>
-      entry.topics.includes(filter) ||
-      entry.activity === filter ||
-      entry.pipelineCurrent === filter ||
-      entry.knowledgeConnections?.some((connection) => connection.kind === filter || connection.label.includes(filter)),
-  );
-}
-
 function IntelligenceCard({
   entry,
-  highlighted = true,
-  subdued = false,
 }: {
   entry: IntelligenceEntry;
-  highlighted?: boolean;
-  subdued?: boolean;
 }) {
   const router = useRouter();
   const relationshipCount =
@@ -113,11 +97,7 @@ function IntelligenceCard({
           router.push(`/intelligence/${entry.slug}`);
         }
       }}
-      className={`group rounded-[1.75rem] border bg-white/[0.04] transition duration-300 hover:-translate-y-1 hover:bg-white/[0.06] ${getLayoutClasses(entry.editorialLayout)} ${
-        highlighted
-          ? "border-aurora/25 shadow-[0_0_0_1px_rgba(159,245,210,0.04)] hover:border-azure/35"
-          : "border-white/10 hover:border-white/16"
-      } ${subdued ? "opacity-45" : "opacity-100"}`}
+      className={`group rounded-[1.75rem] border border-white/10 bg-white/[0.04] transition duration-300 hover:-translate-y-1 hover:border-azure/35 hover:bg-white/[0.06] ${getLayoutClasses(entry.editorialLayout)}`}
     >
       <div className="flex h-full flex-col gap-5">
         <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/40 transition duration-300 group-hover:text-white/58">
@@ -173,12 +153,9 @@ function IntelligenceCard({
 }
 
 export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: IntelligenceLibraryProps) {
-  const defaultAtlasDomain = getAtlasDomainByTitle("AI Compliance");
   const [query, setQuery] = useState("");
   const [activeTopic, setActiveTopic] = useState<string>(initialTopic);
   const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [atlasDomain, setAtlasDomain] = useState<string>(defaultAtlasDomain.title);
-  const [atlasFilters, setAtlasFilters] = useState<string[]>(defaultAtlasDomain.filters);
 
   const primaryFilters = primaryFilterOrder.filter((filter) => filter === "All" || topics.includes(filter));
 
@@ -198,32 +175,19 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
 
       const matchesQuery = normalized.includes(query.toLowerCase());
       const matchesTopic = activeTopic === "All" || entry.topics.includes(activeTopic);
-      const matchesAtlas =
-        !atlasDomain ||
-        atlasFilters.some(
-          (filter) =>
-            entry.topics.includes(filter) ||
-            entry.activity === filter ||
-            entry.pipelineCurrent === filter ||
-            entry.knowledgeConnections?.some(
-              (connection) => connection.kind === filter || connection.label.includes(filter),
-            ),
-        );
       const matchesFeatured = !featuredOnly || entry.featured || entry.pinned;
 
-      return matchesQuery && matchesTopic && matchesAtlas && matchesFeatured;
+      return matchesQuery && matchesTopic && matchesFeatured;
     });
-  }, [activeTopic, atlasDomain, atlasFilters, entries, featuredOnly, query]);
+  }, [activeTopic, entries, featuredOnly, query]);
 
   const groupedEntries = groupEntries(visibleEntries);
   const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
-  const atlasMatchedSlugs = useMemo(() => {
-    if (!atlasDomain || atlasFilters.length === 0) {
-      return new Set<string>();
-    }
-
-    return new Set(entries.filter((entry) => entryMatchesAtlas(entry, atlasFilters)).map((entry) => entry.slug));
-  }, [atlasDomain, atlasFilters, entries]);
+  const totalConnections = entries.reduce(
+    (count, entry) => count + (entry.knowledgeConnections?.length ?? 0) + entry.relatedFrameworks.length,
+    0,
+  );
+  const featuredEntries = groupedEntries.find((group) => group.title === "Featured content")?.entries ?? [];
 
   return (
     <div className="space-y-10">
@@ -272,52 +236,44 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
         </div>
       </div>
 
-      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.08fr),minmax(0,0.92fr)]">
-        <div className="space-y-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr),minmax(320px,0.8fr)]">
+        <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-5 md:p-6">
           <p className="text-xs uppercase tracking-[0.24em] text-white/42">Featured content</p>
-          <div className="grid gap-4 xl:grid-cols-2">
-            {groupedEntries.find((group) => group.title === "Featured content")?.entries.map((entry) => (
-              <IntelligenceCard
-                key={entry.slug}
-                entry={entry}
-                highlighted={!atlasDomain || atlasMatchedSlugs.has(entry.slug)}
-                subdued={!!atlasDomain && !atlasMatchedSlugs.has(entry.slug)}
-              />
+          <div className="mt-4 grid gap-4 xl:grid-cols-2">
+            {featuredEntries.map((entry) => (
+              <IntelligenceCard key={entry.slug} entry={entry} />
             ))}
           </div>
         </div>
 
-        <SystemsAtlas
-          activeDomain={atlasDomain as
-            | "AI Compliance"
-            | "Software Engineering"
-            | "Systems Design"
-            | "Future Technology"
-            | "Research"
-            | "Writing"
-            | "Frameworks"}
-          onOpenContent={() => {
-            document.getElementById("intelligence-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-          onSelect={(domain, filters) => {
-            setAtlasDomain(domain);
-            setAtlasFilters(filters);
-
-            const matchingPrimaryTopic = filters.find((filter) =>
-              primaryFilters.includes(filter as (typeof primaryFilterOrder)[number]),
-            );
-
-            if (matchingPrimaryTopic) {
-              setActiveTopic(matchingPrimaryTopic);
-            }
-          }}
-        />
+        <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
+          <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Library scale</p>
+            <p className="mt-3 font-display text-3xl text-white">{entries.length}</p>
+            <p className="mt-2 text-sm leading-6 text-white/58">Published pieces, frameworks, notes, and essays.</p>
+          </div>
+          <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Knowledge links</p>
+            <p className="mt-3 font-display text-3xl text-white">{totalConnections}</p>
+            <p className="mt-2 text-sm leading-6 text-white/58">Cross-links between ideas, projects, and frameworks.</p>
+          </div>
+          <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Current activity</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {liveSignals.slice(0, 4).map((signal) => (
+                <span
+                  key={signal}
+                  className="rounded-full border border-white/10 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/52"
+                >
+                  {signal}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <span className="rounded-full border border-aurora/25 bg-white/[0.06] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-white/62">
-          Atlas focus: {atlasDomain}
-        </span>
         {liveSignals.map((signal) => (
           <span
             key={signal}
@@ -342,12 +298,7 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
               </div>
               <div className={getLaneGridClasses(group.title)}>
                 {group.entries.map((entry) => (
-                  <IntelligenceCard
-                    key={entry.slug}
-                    entry={entry}
-                    highlighted={!atlasDomain || atlasMatchedSlugs.has(entry.slug)}
-                    subdued={!!atlasDomain && !atlasMatchedSlugs.has(entry.slug)}
-                  />
+                  <IntelligenceCard key={entry.slug} entry={entry} />
                 ))}
               </div>
             </section>
