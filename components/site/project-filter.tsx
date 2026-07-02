@@ -6,6 +6,7 @@ import { ProjectEntry, ProjectStatus } from "@/lib/project-content";
 
 type ProjectFilterProps = {
   projects: ProjectEntry[];
+  initialTag?: string;
 };
 
 type SortMode = "Priority" | "Newest stage" | "Status";
@@ -34,14 +35,18 @@ function sortProjects(projects: ProjectEntry[], mode: SortMode) {
   return items;
 }
 
-export function ProjectFilter({ projects }: ProjectFilterProps) {
+export function ProjectFilter({ projects, initialTag = "All" }: ProjectFilterProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeStatus, setActiveStatus] = useState<ProjectStatus | "All">("All");
+  const [activeTag, setActiveTag] = useState(initialTag);
   const [sortMode, setSortMode] = useState<SortMode>("Priority");
 
   const categories = Array.from(new Set(projects.map((project) => project.category)));
   const statuses = Array.from(new Set(projects.map((project) => project.status)));
+  const tags = Array.from(new Set(projects.flatMap((project) => project.tags))).sort((left, right) =>
+    left.localeCompare(right),
+  );
 
   const filtered = useMemo(() => {
     return sortProjects(
@@ -61,12 +66,13 @@ export function ProjectFilter({ projects }: ProjectFilterProps) {
         const matchesQuery = haystack.includes(query.toLowerCase());
         const matchesCategory = activeCategory === "All" || project.category === activeCategory;
         const matchesStatus = activeStatus === "All" || project.status === activeStatus;
+        const matchesTag = activeTag === "All" || project.tags.includes(activeTag);
 
-        return matchesQuery && matchesCategory && matchesStatus;
+        return matchesQuery && matchesCategory && matchesStatus && matchesTag;
       }),
       sortMode,
     );
-  }, [activeCategory, activeStatus, projects, query, sortMode]);
+  }, [activeCategory, activeStatus, activeTag, projects, query, sortMode]);
 
   const grouped = groupProjects(filtered);
 
@@ -120,6 +126,24 @@ export function ProjectFilter({ projects }: ProjectFilterProps) {
                 }`}
               >
                 {status}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-xs uppercase tracking-[0.24em] text-white/42">Topics</p>
+            {["All", ...tags].map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => setActiveTag(tag)}
+                className={`rounded-full border px-3 py-2 text-xs uppercase tracking-[0.22em] transition ${
+                  activeTag === tag
+                    ? "border-ember/40 bg-white/[0.09] text-white"
+                    : "border-white/10 bg-white/[0.04] text-white/56 hover:text-white"
+                }`}
+              >
+                {tag}
               </button>
             ))}
           </div>

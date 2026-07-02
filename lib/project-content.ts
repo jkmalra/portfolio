@@ -112,6 +112,15 @@ export async function getProjectTags() {
   );
 }
 
+export function projectTagToSlug(tag: string) {
+  return tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export async function getProjectTagFromSlug(slug: string) {
+  const tags = await getProjectTags();
+  return tags.find((tag) => projectTagToSlug(tag) === slug) ?? null;
+}
+
 export async function getRelatedProjects(project: Pick<ProjectFrontmatter, "slug" | "category" | "tags" | "relatedProjects">, limit = 3) {
   const projects = await getAllProjects();
 

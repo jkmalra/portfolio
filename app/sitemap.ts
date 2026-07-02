@@ -1,13 +1,14 @@
 import { MetadataRoute } from "next";
 import { getAllIntelligenceEntries, getIntelligenceTopics, topicToSlug } from "@/lib/intelligence";
-import { getAllProjects } from "@/lib/project-content";
+import { getAllProjects, getProjectTags, projectTagToSlug } from "@/lib/project-content";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://example.com";
-  const [entries, topics, projects] = await Promise.all([
+  const [entries, topics, projects, projectTags] = await Promise.all([
     getAllIntelligenceEntries(),
     getIntelligenceTopics(),
     getAllProjects(),
+    getProjectTags(),
   ]);
 
   const staticRoutes = [
@@ -37,5 +38,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(project.updated),
   }));
 
-  return [...staticRoutes, ...articleRoutes, ...topicRoutes, ...projectRoutes];
+  const projectTagRoutes = projectTags.map((tag) => ({
+    url: `${baseUrl}/projects/tags/${projectTagToSlug(tag)}`,
+    lastModified: new Date(),
+  }));
+
+  return [...staticRoutes, ...articleRoutes, ...topicRoutes, ...projectRoutes, ...projectTagRoutes];
 }
