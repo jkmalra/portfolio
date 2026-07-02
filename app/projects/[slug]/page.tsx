@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Reveal } from "@/components/motion/reveal";
@@ -97,6 +98,19 @@ export default async function ProjectDetailPage({
               This page is generated from one MDX file. Update the frontmatter, rewrite the Markdown below it,
               and the dossier updates automatically.
             </p>
+            {project.frontmatter.cover ? (
+              <div className="mt-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/20">
+                <div className="relative aspect-[16/9] w-full">
+                  <Image
+                    src={project.frontmatter.cover}
+                    alt={`${project.frontmatter.title} cover`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1280px) 100vw, 820px"
+                  />
+                </div>
+              </div>
+            ) : null}
             {project.frontmatter.metrics && project.frontmatter.metrics.length > 0 ? (
               <div className="mt-8">
                 <MetricCluster metrics={project.frontmatter.metrics} />
@@ -109,6 +123,37 @@ export default async function ProjectDetailPage({
               {project.content}
             </div>
           </section>
+
+          {project.frontmatter.gallery && project.frontmatter.gallery.length > 0 ? (
+            <section className="surface-shell p-8">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <p className="font-display text-xs uppercase tracking-[0.34em] text-ember/80">Project media</p>
+                  <h2 className="mt-3 font-display text-3xl text-white">Supporting visuals</h2>
+                </div>
+                <p className="text-sm text-white/42">{project.frontmatter.gallery.length} assets</p>
+              </div>
+
+              <div className="mt-8 grid gap-4 md:grid-cols-2">
+                {project.frontmatter.gallery.map((image, index) => (
+                  <div
+                    key={image}
+                    className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20"
+                  >
+                    <div className="relative aspect-[4/3] w-full">
+                      <Image
+                        src={image}
+                        alt={`${project.frontmatter.title} gallery image ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           {(relatedProjects.length > 0 || (project.frontmatter.relatedWriting?.length ?? 0) > 0) ? (
             <section className="grid gap-6 md:grid-cols-2">

@@ -5,16 +5,15 @@ import { MetricCluster } from "@/components/site/metric-cluster";
 import { ProjectCard } from "@/components/site/project-card";
 import { SectionIntro } from "@/components/site/section-intro";
 import { getFeaturedIntelligenceEntries, getLatestIntelligenceEntries } from "@/lib/intelligence";
-import { getAllProjects } from "@/lib/project-content";
+import { getFeaturedProjects } from "@/lib/project-content";
 import { featuredSignals, proofPoints, resumeSummary } from "@/lib/site-data";
 
 export default async function HomePage() {
-  const [featuredEntries, latestEntries, allProjects] = await Promise.all([
+  const [featuredEntries, latestEntries, projects] = await Promise.all([
     getFeaturedIntelligenceEntries(),
     getLatestIntelligenceEntries(5),
-    getAllProjects(),
+    getFeaturedProjects(),
   ]);
-  const projects = allProjects.slice(0, 3);
 
   return (
     <div id="main-content">
