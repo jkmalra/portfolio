@@ -78,7 +78,25 @@ function groupEntries(entries: IntelligenceEntry[]) {
   ].filter((group) => group.entries.length > 0);
 }
 
-function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
+function entryMatchesAtlas(entry: IntelligenceEntry, atlasFilters: string[]) {
+  return atlasFilters.some(
+    (filter) =>
+      entry.topics.includes(filter) ||
+      entry.activity === filter ||
+      entry.pipelineCurrent === filter ||
+      entry.knowledgeConnections?.some((connection) => connection.kind === filter || connection.label.includes(filter)),
+  );
+}
+
+function IntelligenceCard({
+  entry,
+  highlighted = true,
+  subdued = false,
+}: {
+  entry: IntelligenceEntry;
+  highlighted?: boolean;
+  subdued?: boolean;
+}) {
   const router = useRouter();
   const relationshipCount =
     (entry.knowledgeConnections?.length ?? 0) + entry.relatedArticles.length + entry.relatedFrameworks.length;
@@ -94,7 +112,11 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
           router.push(`/intelligence/${entry.slug}`);
         }
       }}
-      className={`group rounded-[1.75rem] border border-white/10 bg-white/[0.04] transition duration-300 hover:-translate-y-1 hover:border-azure/35 hover:bg-white/[0.06] ${getLayoutClasses(entry.editorialLayout)}`}
+      className={`group rounded-[1.75rem] border bg-white/[0.04] transition duration-300 hover:-translate-y-1 hover:bg-white/[0.06] ${getLayoutClasses(entry.editorialLayout)} ${
+        highlighted
+          ? "border-aurora/25 shadow-[0_0_0_1px_rgba(159,245,210,0.04)] hover:border-azure/35"
+          : "border-white/10 hover:border-white/16"
+      } ${subdued ? "opacity-45" : "opacity-100"}`}
     >
       <div className="flex h-full flex-col gap-5">
         <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/40 transition duration-300 group-hover:text-white/58">
@@ -141,7 +163,7 @@ function IntelligenceCard({ entry }: { entry: IntelligenceEntry }) {
             {entry.topics[0] ?? "Knowledge"} focus
           </div>
           <span className="translate-x-0 text-sm text-aurora transition duration-300 group-hover:translate-x-1 group-hover:text-white">
-            Open -&gt;
+            {"Open ->"}
           </span>
         </div>
       </div>
@@ -193,6 +215,13 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
 
   const groupedEntries = groupEntries(visibleEntries);
   const liveSignals = Array.from(new Set(entries.map((entry) => entry.activity))).slice(0, 6);
+  const atlasMatchedSlugs = useMemo(() => {
+    if (!atlasDomain) {
+      return new Set<string>();
+    }
+
+    return new Set(entries.filter((entry) => entryMatchesAtlas(entry, atlasFilters)).map((entry) => entry.slug));
+  }, [atlasDomain, atlasFilters, entries]);
 
   return (
     <div className="space-y-10">
@@ -246,7 +275,12 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
           <p className="text-xs uppercase tracking-[0.24em] text-white/42">Featured content</p>
           <div className="grid gap-4 xl:grid-cols-2">
             {groupedEntries.find((group) => group.title === "Featured content")?.entries.map((entry) => (
-              <IntelligenceCard key={entry.slug} entry={entry} />
+              <IntelligenceCard
+                key={entry.slug}
+                entry={entry}
+                highlighted={!atlasDomain || atlasMatchedSlugs.has(entry.slug)}
+                subdued={!!atlasDomain && !atlasMatchedSlugs.has(entry.slug)}
+              />
             ))}
           </div>
         </div>
@@ -263,6 +297,7 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
             | "Decision Making"
             | "Projects"
             | null}
+          entries={entries}
           onSelect={(domain, filters) => {
             setAtlasDomain(domain);
             setAtlasFilters(filters);
@@ -312,7 +347,12 @@ export function IntelligenceLibrary({ entries, topics, initialTopic = "All" }: I
               </div>
               <div className={getLaneGridClasses(group.title)}>
                 {group.entries.map((entry) => (
-                  <IntelligenceCard key={entry.slug} entry={entry} />
+                  <IntelligenceCard
+                    key={entry.slug}
+                    entry={entry}
+                    highlighted={!atlasDomain || atlasMatchedSlugs.has(entry.slug)}
+                    subdued={!!atlasDomain && !atlasMatchedSlugs.has(entry.slug)}
+                  />
                 ))}
               </div>
             </section>
