@@ -5,9 +5,11 @@ import { MetricCluster } from "@/components/site/metric-cluster";
 import { ProjectCard } from "@/components/site/project-card";
 import { SectionIntro } from "@/components/site/section-intro";
 import { getFeaturedIntelligenceEntries, getLatestIntelligenceEntries } from "@/lib/intelligence";
-import { featuredSignals, projects, proofPoints, resumeSummary } from "@/lib/site-data";
+import { getAllProjects } from "@/lib/project-content";
+import { featuredSignals, proofPoints, resumeSummary } from "@/lib/site-data";
 
 export default async function HomePage() {
+  const projects = getAllProjects().slice(0, 3);
   const [featuredEntries, latestEntries] = await Promise.all([
     getFeaturedIntelligenceEntries(),
     getLatestIntelligenceEntries(5),

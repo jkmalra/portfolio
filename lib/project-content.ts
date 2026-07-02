@@ -366,6 +366,85 @@ export const projectContent: ProjectContent[] = [
     relatedProjects: ["aether-signal", "helios-lattice"],
     relatedWriting: ["/intelligence/portfolio-operating-surfaces", "/intelligence/why-future-portfolios-need-strong-route-design"],
   },
+  {
+    slug: "regulaflow",
+    title: "RegulaFlow",
+    summary: "A lightweight evidence tracker for compliance workflows, review queues, and policy follow-through.",
+    strapline: "A smaller operational tool for structuring evidence collection in governance-oriented workflows.",
+    category: "Developer Tools",
+    status: "Research",
+    tier: "Tier 3",
+    featured: false,
+    role: "Builder and workflow researcher",
+    stage: "Research prototype",
+    year: "2037 lab",
+    stack: ["FastAPI", "Postgres", "React", "Workflow Design"],
+    tags: ["Evidence", "Policy Ops", "Internal Tools"],
+    domain: "developer tools",
+    sortOrder: 4,
+    executiveSummary:
+      "RegulaFlow is a smaller experiment focused on evidence intake and review flow. It exists to test how governance work can stay organized before it needs a fully featured compliance operating surface.",
+    problem:
+      "Even basic compliance tasks become messy when evidence requests, ownership, and review state are tracked across scattered notes and messages.",
+    context:
+      "This experiment was built to test whether a lighter-weight system could improve traceability before larger product surfaces are needed.",
+    solution:
+      "I designed a compact evidence queue with submission states, ownership markers, and policy-linked review notes.",
+    architecture: [
+      "Simple intake pipeline for evidence requests and response states.",
+      "Tagged review records tied to policy or control families.",
+      "Minimal interface focused on clarity over feature depth.",
+    ],
+    modules: [
+      {
+        name: "Evidence Queue",
+        summary: "Tracks what needs to be gathered, who owns it, and what is still missing.",
+      },
+      {
+        name: "Review Notes",
+        summary: "Keeps reviewer comments connected to individual evidence records.",
+      },
+    ],
+    trustLayer: [
+      "Clear ownership markers for accountability.",
+      "Basic decision traceability for why an item was approved or returned.",
+    ],
+    metrics: [
+      { label: "Evidence states tracked", value: "6", detail: "Core workflow checkpoints" },
+      { label: "Pilot reviewers", value: "3", detail: "Internal testing frame" },
+      { label: "Status visibility", value: "Improved", detail: "Compared with note-based tracking" },
+    ],
+    results: [
+      "Validated the need for a lighter evidence workflow before larger compliance surfaces.",
+      "Created a credible supporting experiment for governance operations.",
+    ],
+    decisions: [
+      {
+        title: "Keep scope intentionally narrow",
+        summary: "The purpose was to learn workflow behavior, not simulate a full enterprise suite.",
+      },
+    ],
+    roadmap: [
+      { title: "Basic export layer", status: "planned" },
+      { title: "Reviewer comparison mode", status: "coming soon" },
+    ],
+    resources: [
+      { label: "Research notes", href: "/intelligence/notes-on-governance-language" },
+      { label: "Prototype repository", href: "https://github.com/example/regulaflow" },
+    ],
+    links: {
+      github: "https://github.com/example/regulaflow",
+      docs: "/intelligence/notes-on-governance-language",
+    },
+    preview: {
+      eyebrow: "Workflow preview",
+      title: "Evidence queue snapshot",
+      description: "A compact internal tool surface focused on ownership, review state, and policy linkage.",
+      items: ["Queue states", "Owner handoff", "Review notes"],
+    },
+    relatedProjects: ["aether-signal"],
+    relatedWriting: ["/intelligence/notes-on-governance-language"],
+  },
 ];
 
 export function getAllProjects() {
