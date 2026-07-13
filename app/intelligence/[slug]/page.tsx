@@ -95,12 +95,6 @@ export default async function IntelligenceEntryPage({
               </div>
             </section>
 
-            {entry.knowledgeConnections && entry.knowledgeConnections.length > 0 ? (
-              <section>
-                <ConnectedKnowledgeGraph connections={entry.knowledgeConnections} />
-              </section>
-            ) : null}
-
             {relatedEntries.length > 0 ? (
               <section>
                 <p className="text-xs uppercase tracking-[0.24em] text-white/42">Related articles</p>
