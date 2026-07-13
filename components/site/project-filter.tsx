@@ -130,41 +130,38 @@ export function ProjectFilter({ projects, initialTag = "All" }: ProjectFilterPro
   }, [activeCategory, activeStatus, activeTag, projects, query, sortMode]);
 
   return (
-    <div className="space-y-6">
-      <div className="surface-shell p-4 md:p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex-1">
-            <label htmlFor="project-search" className="sr-only">
-              Search projects
-            </label>
-            <input
-              id="project-search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by project name, stack, architecture, or signal..."
-              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-aurora/40"
-            />
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((current) => !current)}
-              className={`rounded-full border px-4 py-3 text-xs uppercase tracking-[0.24em] transition ${
-                filtersOpen || hasActiveFilters
-                  ? "border-white/20 bg-white/[0.09] text-white"
-                  : "border-white/10 bg-white/[0.04] text-white/56 hover:text-white"
-              }`}
-            >
-              {filtersOpen ? "Hide Filters" : "Filters"}
-            </button>
-            <p className="text-sm text-white/42">
-              {filtered.length} {filtered.length === 1 ? "project" : "projects"}
-            </p>
-          </div>
+    <div className="space-y-5">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex-1">
+          <label htmlFor="project-search" className="sr-only">
+            Search projects
+          </label>
+          <input
+            id="project-search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search projects..."
+            className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-aurora/40"
+          />
         </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((current) => !current)}
+            className={`rounded-full border px-4 py-3 text-xs uppercase tracking-[0.24em] transition ${
+              filtersOpen || hasActiveFilters
+                ? "border-white/20 bg-white/[0.09] text-white"
+                : "border-white/10 bg-white/[0.04] text-white/56 hover:text-white"
+            }`}
+          >
+            {filtersOpen ? "Hide Filters" : "Filters"}
+          </button>
+        </div>
+      </div>
 
-        {(filtersOpen || hasActiveFilters) ? (
-          <div className="mt-4 space-y-4 rounded-[1.5rem] border border-white/10 bg-black/20 p-4">
+      {(filtersOpen || hasActiveFilters) ? (
+        <div className="surface-shell p-4 md:p-5">
+          <div className="space-y-4 rounded-[1.5rem] border border-white/10 bg-black/20 p-4">
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-xs uppercase tracking-[0.24em] text-white/42">Category</p>
               {["All", ...categories].map((category) => (
@@ -236,8 +233,8 @@ export function ProjectFilter({ projects, initialTag = "All" }: ProjectFilterPro
               </div>
             ) : null}
           </div>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       {filtered.length > 0 ? (
         <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -248,9 +245,7 @@ export function ProjectFilter({ projects, initialTag = "All" }: ProjectFilterPro
       ) : (
         <div className="surface-shell p-8">
           <p className="font-display text-2xl text-white">No projects match this view.</p>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-white/56">
-            Try a broader search term or clear the current filters to return to the full project library.
-          </p>
+          <p className="mt-3 text-sm leading-7 text-white/56">Try a broader search or reset the filters.</p>
         </div>
       )}
     </div>
